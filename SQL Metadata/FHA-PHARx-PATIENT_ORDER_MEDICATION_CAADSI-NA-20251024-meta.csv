@@ -1,0 +1,28 @@
+table,database,view,column_name,field_name,field_name_alias,description,data_type,identifier_flag
+patient,FHA,F_MeditechADMPatMain,F_MeditechADMPatMain.UnitNumber,UnitNumber,Account,The patient's unit number/account identifier,varchar(30),Indirect
+patient,FHA,F_MeditechADMPatMain,F_MeditechADMPatMain.AcctNumber,AcctNumber,MRN,The patient's Medical Record Number,varchar(18),Indirect
+location,FHA,D_MeditechPHASiteDictionary,D_MeditechPHASiteDictionary.Mnemonic,Mnemonic,Site,The facility/site mnemonic identifier,varchar(10),Indirect
+location,FHA,F_MeditechADMPatMain,F_MeditechADMPatMain.Location,Location,Location,The patient's nursing unit location,varchar(15),Indirect
+facility,FHA,D_MeditechPHASiteDictionary,D_MeditechPHASiteDictionary.Name,Name,Site Name,The site (hospital/clinic) name,varchar(30),Indirect
+facility,FHA,D_MeditechPHASiteDictionary,D_MeditechPHASiteDictionary.Address1,Address1,Street,The site (hospital/clinic) address,varchar(30),Indirect
+facility,FHA,D_MeditechPHASiteDictionary,D_MeditechPHASiteDictionary.City,City,City,The facility city,varchar(20),Indirect
+facility,FHA,D_MeditechPHASiteDictionary,D_MeditechPHASiteDictionary.State,State,Province,The facility province,varchar(2),Indirect
+facility,FHA,D_MeditechPHASiteDictionary,D_MeditechPHASiteDictionary.PostalCode,PostalCode,Postal Code,The facility postal code,varchar(10),Indirect
+facility,FHA,D_MeditechPHASiteDictionary,D_MeditechPHASiteDictionary.Phone,Phone,Phone,The facility phone number,varchar(20),Indirect
+order,FHA,F_MeditechPHARxMain,F_MeditechPHARxMain.SYSSystemID,SYSSystemID,System,"The Meditech-EMR system data source (MC converted to CS, EX for Expanse)",varchar(2),Indirect
+order,FHA,F_MeditechPHARxMain,F_MeditechPHARxMain.Number,Number,Order Number,The pharmacy order number associated with the order,varchar(255),Indirect
+order,FHA,F_MeditechPHARxMain,F_MeditechPHARxMain.EnterDate,EnterDate,Order Entered,The date/time the order was entered,varchar(8),Indirect
+order,FHA,F_MeditechPHARxMain,F_MeditechPHARxMain.OrderType,OrderType,Order Type,"The type of order (MED, MEDM, etc.)",varchar(255),Indirect
+order,FHA,F_MeditechPHARxMain,F_MeditechPHARxMain.StartDate,StartDate,Order Start,The start date for the order,varchar(8),Indirect
+order,FHA,F_MeditechPHARxMain,F_MeditechPHARxMain.StopDate,StopDate,Order Stop,The stop date for the order,varchar(8),Indirect
+order,FHA,F_MeditechPHARxMain,F_MeditechPHARxMain.Physician,Physician,Provider,The ordering physician/provider,varchar(255),Indirect
+medication,FHA,D_MeditechPHADrugMain,D_MeditechPHADrugMain.Mnemonic,Mnemonic,Drug Mnemonic,The mnemonic associated with the drug product,varchar(255),Indirect
+medication,FHA,D_MeditechPHADrugMain5,D_MeditechPHADrugMain5.DrugId,DrugId,Generic Name,The generic drug name/identifier,varchar(255),Indirect
+medication,FHA,D_MeditechPHADrugMain,D_MeditechPHADrugMain.NdcDinNumber,NdcDinNumber,DIN,The Drug Identification Number (NDC/DIN) of the product,varchar(255),Indirect
+medication,FHA,F_MeditechPHARxInpatientMedications,F_MeditechPHARxInpatientMedications.Dose,Dose,Dose,The medication dose strength amount,varchar(255),Indirect
+medication,FHA,F_MeditechPHARxRangeDoses,F_MeditechPHARxRangeDoses.RangeDoseLow,RangeDoseLow,Range Dose Low,The lower bound of the dose range,varchar(255),Indirect
+medication,FHA,F_MeditechPHARxRangeDoses,F_MeditechPHARxRangeDoses.RangeDoseHigh,RangeDoseHigh,Range Dose High,The upper bound of the dose range,varchar(255),Indirect
+medication,FHA,D_MeditechPHADrugMain,D_MeditechPHADrugMain.DispenseUnit,DispenseUnit,Dose Unit,The medication dose strength unit of measure,varchar(255),Indirect
+medication,FHA,D_MeditechPHADrugMain,D_MeditechPHADrugMain.DispenseForm,DispenseForm,Dosage Form,"The dosage form of the product (tablet, liquid, etc.)",varchar(255),Indirect
+medication,FHA,F_MeditechPHARxMain,F_MeditechPHARxMain.Route,Route,Route,The medication route of administration,varchar(255),Indirect
+medication,FHA,F_MeditechPHARxMain,F_MeditechPHARxMain.Sig,Sig,Frequency,The medication frequency/sig of dosing,varchar(32),Indirect
