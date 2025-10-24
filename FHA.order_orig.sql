@@ -1,0 +1,36 @@
+SELECT
+    rx.Number AS order_id,
+    -- begin original included data from other tables
+    loc.OeSite AS site_id,
+    site.Name AS site_name,
+    site.Address1 AS site_address,
+    pat.Location AS medical_unit,
+    rx.Patient AS patient_id,
+    med.Med AS product_mnemonic,
+    drug_main5.DrugId AS generic_name,
+    rx.OrderType AS order_type,
+    comp.Ingredient AS ingredient_id,
+    drug_main.DispenseUnit AS strength_dose_unit,
+    drug_main.DispenseForm AS dosage_form,
+    med.Volume AS volume_dose,
+    rx.TotalDoses AS total_doses,
+    rx.Physician AS prescriber_mnemonic,
+    doc.Name AS prescriber_full_name,
+    rx.Route AS route,
+    rx.Sig AS frequency,
+    -- end of original data from other tables
+    loc.OeSite AS site_id,
+    rx.EnterDate AS enter_date,
+    rx.EnterTime AS enter_time,
+    rx.DcDate AS orig_stop_dt,
+    rx.DcTime AS orig_stop_tm,
+    rx.StartDate AS order_start_dt,
+    rx.StartTime AS order_start_tm,
+    rx.FirstDoseDate AS first_dose_date,
+    rx.FirstDoseTime AS first_dose_time,
+    rx.StopDate AS order_stop_dt,
+    rx.StopTime AS order_stop_tm,
+    rx.Status AS order_status,
+    rx.OrderType AS order_type
+FROM FHA_ANALYTICS.FHA.F_MeditechPHARxMain AS rx
+INNER JOIN FHA_ANALYTICS.FHA.D_MeditechMISLocnMain AS loc ON loc.Mnemonic = rx.Location;
