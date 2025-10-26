@@ -27,10 +27,15 @@ SELECT TOP 500
     med.Dose AS [Dose],
 	rd.RangeDoseLow AS [Range Dose Low],
     rd.RangeDoseHigh AS [Range Dose High],
+	rx.Schedule,
     drug_main.DispenseUnit AS [Dose Unit],
     drug_main.DispenseForm AS [Dosage Form],
     rx.Route AS [Route],
     rx.Sig AS [Frequency]
+
+	-- Verification Info
+
+
 
 FROM FHA_ANALYTICS.FHA.F_MeditechPHARxMain AS rx
 
@@ -58,3 +63,6 @@ INNER JOIN FHA_ANALYTICS.FHA.D_MeditechMISLocnMain AS loc
     ON loc.Mnemonic COLLATE DATABASE_DEFAULT = pat.Location COLLATE DATABASE_DEFAULT
 INNER JOIN FHA_ANALYTICS.FHA.D_MeditechPHASiteDictionary AS site
     ON site.Mnemonic COLLATE DATABASE_DEFAULT = loc.OeSite COLLATE DATABASE_DEFAULT
+
+-- Exclude stock med orders
+WHERE rx.Sig <> '.STK-MED'
