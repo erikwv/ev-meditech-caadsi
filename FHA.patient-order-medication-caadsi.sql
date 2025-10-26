@@ -34,7 +34,18 @@ SELECT TOP 500
     rx.Sig AS [Frequency]
 
 	-- Verification Info
+    --PhaRxAuditTrail.Type
+    --PhaRxAuditTrail.TypeDate,
+    --PhaRxAuditTrail.TypeTime,
+    --PhaRxAuditTrail.User,
 
+    -- Label Comments Info
+    --PhaRxLabelComments.Urn,
+    --PhaRxLabelComments.LabelComment,
+
+    -- Dose Instructions Info
+    --PhaRxDoseInstructions.Urn,
+    --PhaRxDoseInstructions.DoseInstruction,
 
 
 FROM FHA_ANALYTICS.FHA.F_MeditechPHARxMain AS rx
