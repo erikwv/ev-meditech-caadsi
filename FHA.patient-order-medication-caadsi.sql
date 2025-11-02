@@ -1,37 +1,51 @@
-SELECT TOP 500
+-- Combine multi-line label comments
+WITH CombinedLabelComments AS (
+    SELECT 
+        URN,
+        SYSSystemID,
+        STRING_AGG(LabelComment, CHAR(10)) 
+            WITHIN GROUP (ORDER BY LabelCommentQ) AS FullLabelComment
+    FROM FHA_ANALYTICS.FHA.F_MeditechPHARxLabelComments
+    GROUP BY URN, SYSSystemID
+)
 
-	-- Patient Info
+SELECT TOP 100
+
+    -- Patient Info
     pat.UnitNumber AS [Account],
     pat.AcctNumber AS [MRN],
 
-	-- Location Info
+    -- Location Info
     site.Mnemonic AS [Site],
-	pat.Location AS [Location],
+    pat.Location AS [Location],
 
-     -- Order Info
-	CASE 
-		WHEN rx.SYSSystemID = 'MC' THEN 'CS'
-		ELSE rx.SYSSystemID
-	END AS [System],
+    -- Order Info
+    CASE 
+        WHEN rx.SYSSystemID = 'MC' THEN 'CS'
+        ELSE rx.SYSSystemID
+    END AS [System],
     rx.Number AS [Order Number],
     rx.EnterDate AS [Order Entered],
     rx.OrderType AS [Order Type],
-	rx.StartDate AS [Order Start],
+    rx.StartDate AS [Order Start],
     rx.StopDate AS [Order Stop],
-	rx.Physician AS [Provider],
+    rx.Physician AS [Provider],
 
     -- Medication Info
     drug_main.Mnemonic AS [Drug Mnemonic],
     drug_main5.DrugId AS [Generic Name],
     drug_main.NdcDinNumber AS [DIN],
     med.Dose AS [Dose],
-	rd.RangeDoseLow AS [Range Dose Low],
+    rd.RangeDoseLow AS [Range Dose Low],
     rd.RangeDoseHigh AS [Range Dose High],
-	rx.Schedule,
+    rx.Schedule,
     drug_main.DispenseUnit AS [Dose Unit],
     drug_main.DispenseForm AS [Dosage Form],
     rx.Route AS [Route],
-    rx.Sig AS [Frequency]
+    rx.Sig AS [Frequency],
+
+    -- Combined Label Comments
+    label.FullLabelComment AS [Label Comment]
 
 	-- Verification Info
     --PhaRxAuditTrail.Type
@@ -39,14 +53,9 @@ SELECT TOP 500
     --PhaRxAuditTrail.TypeTime,
     --PhaRxAuditTrail.User,
 
-    -- Label Comments Info
-    --PhaRxLabelComments.Urn,
-    --PhaRxLabelComments.LabelComment,
-
     -- Dose Instructions Info
     --PhaRxDoseInstructions.Urn,
     --PhaRxDoseInstructions.DoseInstruction,
-
 
 FROM FHA_ANALYTICS.FHA.F_MeditechPHARxMain AS rx
 
@@ -75,5 +84,11 @@ INNER JOIN FHA_ANALYTICS.FHA.D_MeditechMISLocnMain AS loc
 INNER JOIN FHA_ANALYTICS.FHA.D_MeditechPHASiteDictionary AS site
     ON site.Mnemonic COLLATE DATABASE_DEFAULT = loc.OeSite COLLATE DATABASE_DEFAULT
 
--- Exclude stock med orders
+-- Label Comments Join
+LEFT JOIN CombinedLabelComments AS label
+    ON label.URN COLLATE DATABASE_DEFAULT = rx.Urn COLLATE DATABASE_DEFAULT
+   AND label.SYSSystemID COLLATE DATABASE_DEFAULT = rx.SYSSystemID COLLATE DATABASE_DEFAULT
+
+-- Filters
 WHERE rx.Sig <> '.STK-MED'
+  --AND drug_main.Mnemonic IN ('POTCH1.5T', 'SALIPH', 'MAGICL', 'SALBU100H', 'IPRAT20H')
