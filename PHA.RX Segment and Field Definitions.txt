@@ -1,0 +1,73 @@
+PHA.RX Segment and Field Definitions
+
+PHA.RX is the most common DPM used when creating custom reports. This DPM contains data stored for PHA prescriptions, and inpatient medication administrations.
+
+Common Segments:
+
+PHA.RX.main is the main segment of PHA.RX. This segment contains one record for each prescription in PHA.
+PHA.RX.additives is the segment in PHA.RX that contains data related to the IV components of a prescription. This segment contains one record for additive associated to PHA prescriptions. This is a child segment of main.
+PHA.RX.carriers is the segment in PHA.RX that contains information stored for substances used to improve certain drug delivery systems. This segment contains one record for each carrier associated to a PHA prescription. This is a child segment of main.
+PHA.RX.ingredients is the segment in PHA.RX that contains information for substances that comprise complex drug compounds such as creams, ointments, and gels. This segment contains one record for each ingredient associated with a PHA prescription. This is a child segment of main.
+PHA.RX.audit.trail is the segment in PHA.RX that contains data for events that occurred for prescriptions such as when the order was placed, verified, cancelled, discontinued, etc. This segment contains one record for each audit event that occurred for a prescription (ordered chronologically), and an indication of what type of event occurred, when it occurred, and the user associated to the event. This is a child segment of main.
+PHA.RX.label.comments contains comment text entered by the pharmacist to appear on med labels. This segment contains one record for each line of label comment text associated with PHA prescriptions. This is a child segment of main.
+PHA.RX.admin contains one record for each (attempted) instance a prescription was administered to a patient, ordered sequentially for each prescription. This is a sibling segment of main.
+Common Index Files:
+
+PHA.RX.active.x stores prescriptions either by the date they were discontinued or with a "~" character, which indicates the prescription is still active. This index file (not the index file PHA.RX.status.x) should be used to select all current active prescriptions in PHA.
+PHA.RX.admin.dt.tm.x stores prescriptions by the date and time they were administered. Since a prescription can be administered several times, this index file can store several records for each prescription.
+PHA.RX.number.x stores prescriptions by number (the RX number).
+PHA.RX.patient.x stores prescriptions by the field patient (which is equivalent to ADM.PAT.urn). This is useful for creating PHA.RX reports that need to select prescriptions for particular patients, or for creating fragment reports in PHA.RX that are called from reports in patient account specific DPM's such as ADM.PAT.
+PHA.RX.start.date.x stores prescriptions by the field start.date, and is useful for selecting prescriptions by start date in PHA.RX reports.
+PHA.DRUG is the DPM that contains data entered in the PHA Drug Dictionary.
+
+Common Segments:
+
+PHA.DRUG.main is the main segment of PHA.DRUG. This segment contains one record for each drug in the PHA Drug Dictionary. Note: Data entered on the Site tab of the PHA Drug Dictionary for the ".DFT" site only is stored in fields in PHA.DRUG.main (and other child segments of PHA.DRUG.main), not in the segment PHA.DRUG.sites. See Field Information for more details.
+PHA.DRUG.sites contains data entered on the Site tab of the PHA Drug Dictionary. This segment contains one record for each PHA Site with data entered for a drug on the Site tab, except for the ".DFT" site. Information for the ".DFT" site is stored in fields in PHA.DRUG.main (and other child segments of PHA.DRUG.main). This is a child segment of main. Note: If a drug only has data for the ".DFT" PHA Site, there will be no records stored on PHA.DRUG.sites for this drug.
+Common Index Files:
+
+PHA.DRUG.ndc.din.x stores drugs by the corresponding NDC (National Drug Code) number.
+PHA.DRUG.bill.number.x stores drugs by the field bill.number, which is equivalent to the mnemonic field from the BAR Procedure Dictionary (BAR.PROC).
+
+Field	Information
+PHA.RX.status	Possible values are: AC, DC, UNV, CAN.
+
+AC - Active
+
+DC - Discontinued
+
+UNV - Unverified
+
+CAN - Cancelled
+PHA.RX.prn.reason, PHA.RX.prn.reason.free
+These fields contain the PRN reason selected for PRN (pro re nata - as needed) medications. PHA.RX.prn.reason field contains reasons chosen from the PHA PRN Reason Dictionary. PHA.RX.prn.reason.free contains free text reasons entered by pharmacists.
+PHA.RX.titrate.action	Possible values are: Increase, Decrease, Running, Re-Start, Start/Increase, Start/Decrease, Start/Running, Start/Re-Start, Start, Stop.
+PHA.RX.admin.scanned	Field to indicate whether the med label was scanned for BMV purposes during medication administration. Possible values are: Y, N, MAN.
+
+Y - Yes
+
+N - No
+
+MAN - Manual (barcode was damaged/would not scan, number entered manually)
+PHA.RX.admin.scanned.pt	Field to indicate whether the patient wristband was scanned for BMV purposes during medication administration. Possible values are: Y, N, MAN, OTH.
+
+Y - Yes
+
+
+N - No
+
+MAN - Manual (barcode was damaged/would not scan, number entered manually)
+
+OTH - Other (barcode was not scanned, patient was verified using a different source)
+PHA.RX.admin.type	Possible values are: I, B, C, D.
+
+I - Initial Order
+
+B - Manual Bill
+
+C - Manual Credit
+
+D - Document
+PHA.DRUG.usage.type	Possible values are: Formulary, Non-Formulary, Retail.
+PHA.DRUG.dft.dose, PHA.DRUG.dft.route, PHA.DRUG.dft.sig...	These fields store default values entered on the Sites tab for the ".DFT" site in the PHA Drug Dictionary. These fields are from the main segment of PHA.DRUG and have a one-to-one relationship with drug mnemonics.
+PHA.DRUG.dft.schedule	Default schedule entered for the ".DFT" site. Possible values are: SCH, PRN, NR, STA, ONE.
