@@ -1,4 +1,4 @@
--- Combine multi-line label comments
+-- Combine multi-line label comments and dose instructions
 WITH CombinedLabelComments AS (
     SELECT 
         URN,
@@ -6,6 +6,15 @@ WITH CombinedLabelComments AS (
         STRING_AGG(LabelComment, CHAR(10)) 
             WITHIN GROUP (ORDER BY LabelCommentQ) AS FullLabelComment
     FROM FHA_ANALYTICS.FHA.F_MeditechPHARxLabelComments
+    GROUP BY URN, SYSSystemID
+),
+CombinedDoseInstructions AS (
+    SELECT 
+        URN,
+        SYSSystemID,
+        STRING_AGG(DoseInstruction, CHAR(10)) 
+            WITHIN GROUP (ORDER BY DoseInstructionQ) AS FullDoseInstruction
+    FROM FHA_ANALYTICS.FHA.D_MeditechPHARxDoseInstructions
     GROUP BY URN, SYSSystemID
 )
 
@@ -44,18 +53,11 @@ SELECT TOP 100
     rx.Route AS [Route],
     rx.Sig AS [Frequency],
 
-    -- Combined Label Comments
-    label.FullLabelComment AS [Label Comment]
+    -- Multi-line label comments
+    label.FullLabelComment AS [Label Comment],
 
-	-- Verification Info
-    --PhaRxAuditTrail.Type
-    --PhaRxAuditTrail.TypeDate,
-    --PhaRxAuditTrail.TypeTime,
-    --PhaRxAuditTrail.User,
-
-    -- Dose Instructions Info
-    --PhaRxDoseInstructions.Urn,
-    --PhaRxDoseInstructions.DoseInstruction,
+    -- Multi-line dose instructions
+    dose.FullDoseInstruction AS [Dose Instructions]
 
 FROM FHA_ANALYTICS.FHA.F_MeditechPHARxMain AS rx
 
@@ -89,6 +91,11 @@ LEFT JOIN CombinedLabelComments AS label
     ON label.URN COLLATE DATABASE_DEFAULT = rx.Urn COLLATE DATABASE_DEFAULT
    AND label.SYSSystemID COLLATE DATABASE_DEFAULT = rx.SYSSystemID COLLATE DATABASE_DEFAULT
 
+-- Dose Instructions Join
+LEFT JOIN CombinedDoseInstructions AS dose
+    ON dose.URN COLLATE DATABASE_DEFAULT = rx.Urn COLLATE DATABASE_DEFAULT
+   AND dose.SYSSystemID COLLATE DATABASE_DEFAULT = rx.SYSSystemID COLLATE DATABASE_DEFAULT
+
 -- Filters
 WHERE rx.Sig <> '.STK-MED'
-  --AND drug_main.Mnemonic IN ('POTCH1.5T', 'SALIPH', 'MAGICL', 'SALBU100H', 'IPRAT20H')
+--  AND drug_main.Mnemonic IN ('POTCH1.5T', 'SALIPH', 'MAGICL', 'SALBU100H', 'IPRAT20H')
