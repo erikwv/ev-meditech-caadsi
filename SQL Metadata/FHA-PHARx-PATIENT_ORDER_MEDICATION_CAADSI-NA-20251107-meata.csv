@@ -26,3 +26,5 @@ medication,FHA,D_MeditechPHADrugMain,D_MeditechPHADrugMain.DispenseUnit,Dispense
 medication,FHA,D_MeditechPHADrugMain,D_MeditechPHADrugMain.DispenseForm,DispenseForm,Dosage Form,"The dosage form of the product (tablet, liquid, etc.)",varchar(255),Indirect
 medication,FHA,F_MeditechPHARxMain,F_MeditechPHARxMain.Route,Route,Route,The medication route of administration,varchar(255),Indirect
 medication,FHA,F_MeditechPHARxMain,F_MeditechPHARxMain.Sig,Sig,Frequency,The medication frequency/sig of dosing,varchar(32),Indirect
+dose_instruction,FHA,D_MeditechPHARxDoseInstructions,D_MeditechPHARxDoseInstructions.DoseInstruction,DoseInstruction,Dose Instructions,Combined multi-line dose instructions per order (via STRING_AGG),varchar(255),Indirect
+label_comment,FHA,F_MeditechPHARxLabelComments,F_MeditechPHARxLabelComments.LabelComment,LabelComment,Label Comment,Combined multi-line label comment per order (via STRING_AGG),varchar(255),Indirect
