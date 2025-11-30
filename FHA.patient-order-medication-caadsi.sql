@@ -64,8 +64,10 @@ SELECT TOP 100
         CASE WHEN dose.FullDoseInstruction LIKE '% U %' OR dose.FullDoseInstruction LIKE '% U/%' THEN 'U (Unit)' END,
         CASE WHEN dose.FullDoseInstruction LIKE '% IU %' OR dose.FullDoseInstruction LIKE '% IU/%' THEN 'IU (International Unit)' END,
         CASE WHEN dose.FullDoseInstruction LIKE '%ug %' OR dose.FullDoseInstruction LIKE '%ug/%' THEN 'ug (Microgram)' END,
-        CASE WHEN dose.FullDoseInstruction LIKE '%[0-9]cc %' OR dose.FullDoseInstruction LIKE '%[0-9]CC %' OR 
-                  dose.FullDoseInstruction LIKE '% cc %' OR dose.FullDoseInstruction LIKE '% CC %' THEN 'cc (Cubic Centimeter)' END,
+        CASE WHEN dose.FullDoseInstruction LIKE '%[0-9]cc %' OR dose.FullDoseInstruction LIKE '%[0-9]cc/%' OR 
+                  dose.FullDoseInstruction LIKE '%[0-9]CC %' OR dose.FullDoseInstruction LIKE '%[0-9]CC/%' OR 
+                  dose.FullDoseInstruction LIKE '% cc %' OR dose.FullDoseInstruction LIKE '% cc/%' OR 
+                  dose.FullDoseInstruction LIKE '% CC %' OR dose.FullDoseInstruction LIKE '% CC/%' THEN 'cc (Cubic Centimeter)' END,
         CASE WHEN dose.FullDoseInstruction LIKE '%<%' THEN '< (Less Than)' END,
         CASE WHEN dose.FullDoseInstruction LIKE '%>%' THEN '> (Greater Than)' END,
         CASE WHEN dose.FullDoseInstruction LIKE '%≥%' THEN '≥ (Greater Than or Equal)' END,
@@ -132,11 +134,15 @@ WHERE rx.Sig <> '.STK-MED'
     dose.FullDoseInstruction LIKE '%ug %' OR
     dose.FullDoseInstruction LIKE '%ug/%' OR
     
-    -- cc (cubic centimeter) - must be preceded by number or space, followed by space
+    -- cc (cubic centimeter) - must be preceded by number or space, followed by space or slash
     dose.FullDoseInstruction LIKE '%[0-9]cc %' OR
+    dose.FullDoseInstruction LIKE '%[0-9]cc/%' OR
     dose.FullDoseInstruction LIKE '%[0-9]CC %' OR
+    dose.FullDoseInstruction LIKE '%[0-9]CC/%' OR
     dose.FullDoseInstruction LIKE '% cc %' OR
+    dose.FullDoseInstruction LIKE '% cc/%' OR
     dose.FullDoseInstruction LIKE '% CC %' OR
+    dose.FullDoseInstruction LIKE '% CC/%' OR
     
     -- Symbols
     dose.FullDoseInstruction LIKE '%<%' OR
