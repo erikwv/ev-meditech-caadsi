@@ -64,7 +64,7 @@ SELECT TOP 100
         CASE WHEN dose.FullDoseInstruction LIKE '%[^A-Z]U[^A-Z]%' OR dose.FullDoseInstruction LIKE '% U %' THEN 'U (Unit)' END,
         CASE WHEN dose.FullDoseInstruction LIKE '%[^A-Z]IU[^A-Z]%' OR dose.FullDoseInstruction LIKE '% IU %' THEN 'IU (International Unit)' END,
         CASE WHEN dose.FullDoseInstruction LIKE '%ug %' OR dose.FullDoseInstruction LIKE '%ug/%' THEN 'ug (Microgram)' END,
-        CASE WHEN dose.FullDoseInstruction LIKE '%cc %' OR dose.FullDoseInstruction LIKE '%CC %' THEN 'cc (Cubic Centimeter)' END
+        CASE WHEN dose.FullDoseInstruction LIKE '%cc %' OR dose.FullDoseInstruction LIKE '%cc/%' OR dose.FullDoseInstruction LIKE '%CC %' OR dose.FullDoseInstruction LIKE '%CC/%' THEN 'cc (Cubic Centimeter)' END
     ) AS [Flagged Abbreviation]
 
 FROM FHA_ANALYTICS.FHA.F_MeditechPHARxMain AS rx
@@ -123,5 +123,7 @@ WHERE rx.Sig <> '.STK-MED'
     
     -- cc (cubic centimeter)
     dose.FullDoseInstruction LIKE '%cc %' OR
-    dose.FullDoseInstruction LIKE '%CC %'
+    dose.FullDoseInstruction LIKE '%cc/%' OR
+    dose.FullDoseInstruction LIKE '%CC %' OR
+    dose.FullDoseInstruction LIKE '%CC/%'
   )
