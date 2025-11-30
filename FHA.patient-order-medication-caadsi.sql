@@ -57,7 +57,15 @@ SELECT TOP 100
     label.FullLabelComment AS [Label Comment],
 
     -- Multi-line dose instructions
-    dose.FullDoseInstruction AS [Dose Instructions]
+    dose.FullDoseInstruction AS [Dose Instructions],
+
+    -- Flagged abbreviation type (concatenated if multiple)
+    CONCAT_WS(', ',
+        CASE WHEN dose.FullDoseInstruction LIKE '%[^A-Z]U[^A-Z]%' OR dose.FullDoseInstruction LIKE '% U %' THEN 'U (Unit)' END,
+        CASE WHEN dose.FullDoseInstruction LIKE '%[^A-Z]IU[^A-Z]%' OR dose.FullDoseInstruction LIKE '% IU %' THEN 'IU (International Unit)' END,
+        CASE WHEN dose.FullDoseInstruction LIKE '%ug%' THEN 'ug (Microgram)' END,
+        CASE WHEN dose.FullDoseInstruction LIKE '%cc%' OR dose.FullDoseInstruction LIKE '%CC%' THEN 'cc (Cubic Centimeter)' END
+    ) AS [Flagged Abbreviation]
 
 FROM FHA_ANALYTICS.FHA.F_MeditechPHARxMain AS rx
 
@@ -98,4 +106,18 @@ LEFT JOIN CombinedDoseInstructions AS dose
 
 -- Filters
 WHERE rx.Sig <> '.STK-MED'
---  AND drug_main.Mnemonic IN ('POTCH1.5T', 'SALIPH', 'MAGICL', 'SALBU100H', 'IPRAT20H')
+-- Filter for unapproved medical abbreviations in Dose Instructions
+  AND (
+    -- U or IU (unit abbreviations)
+    dose.FullDoseInstruction LIKE '%[^A-Z]U[^A-Z]%' OR
+    dose.FullDoseInstruction LIKE '% U %' OR
+    dose.FullDoseInstruction LIKE '%[^A-Z]IU[^A-Z]%' OR
+    dose.FullDoseInstruction LIKE '% IU %' OR
+    
+    -- ug (microgram)
+    dose.FullDoseInstruction LIKE '%ug%' OR
+    
+    -- cc (cubic centimeter)
+    dose.FullDoseInstruction LIKE '%cc%' OR
+    dose.FullDoseInstruction LIKE '%CC%'
+  )
