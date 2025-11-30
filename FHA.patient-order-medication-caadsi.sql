@@ -71,7 +71,11 @@ SELECT TOP 100
         CASE WHEN dose.FullDoseInstruction LIKE '%≥%' THEN '≥ (Greater Than or Equal)' END,
         CASE WHEN dose.FullDoseInstruction LIKE '%≤%' THEN '≤ (Less Than or Equal)' END,
         CASE WHEN dose.FullDoseInstruction LIKE '%@%' THEN '@ (At Symbol)' END,
-        CASE WHEN dose.FullDoseInstruction LIKE '%D/C%' OR dose.FullDoseInstruction LIKE '%d/c%' THEN 'D/C (Discharge/Discontinue)' END
+        CASE WHEN dose.FullDoseInstruction LIKE '%D/C%' OR dose.FullDoseInstruction LIKE '%d/c%' THEN 'D/C (Discharge/Discontinue)' END,
+        CASE WHEN dose.FullDoseInstruction LIKE '% OD %' OR dose.FullDoseInstruction LIKE '% od %' THEN 'OD (Once Daily)' END,
+        CASE WHEN dose.FullDoseInstruction LIKE '% QD %' OR dose.FullDoseInstruction LIKE '% qd %' THEN 'QD (Daily)' END,
+        CASE WHEN dose.FullDoseInstruction LIKE '% QOD %' OR dose.FullDoseInstruction LIKE '% qod %' THEN 'QOD (Every Other Day)' END,
+        CASE WHEN dose.FullDoseInstruction LIKE '% EOD %' OR dose.FullDoseInstruction LIKE '% eod %' THEN 'EOD (Every Other Day)' END
     ) AS [Flagged Abbreviation]
 
 FROM FHA_ANALYTICS.FHA.F_MeditechPHARxMain AS rx
@@ -143,5 +147,15 @@ WHERE rx.Sig <> '.STK-MED'
     
     -- D/C (discharge/discontinue)
     dose.FullDoseInstruction LIKE '%D/C%' OR
-    dose.FullDoseInstruction LIKE '%d/c%'
+    dose.FullDoseInstruction LIKE '%d/c%' OR
+    
+    -- Frequency abbreviations
+    dose.FullDoseInstruction LIKE '% OD %' OR
+    dose.FullDoseInstruction LIKE '% od %' OR
+    dose.FullDoseInstruction LIKE '% QD %' OR
+    dose.FullDoseInstruction LIKE '% qd %' OR
+    dose.FullDoseInstruction LIKE '% QOD %' OR
+    dose.FullDoseInstruction LIKE '% qod %' OR
+    dose.FullDoseInstruction LIKE '% EOD %' OR
+    dose.FullDoseInstruction LIKE '% eod %'
   )
