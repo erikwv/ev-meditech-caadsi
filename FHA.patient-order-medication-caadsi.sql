@@ -69,8 +69,8 @@ SELECT TOP 100
                   dose.FullDoseInstruction LIKE '%[0-9]CC %' OR dose.FullDoseInstruction LIKE '%[0-9]CC/%' OR 
                   dose.FullDoseInstruction LIKE '% cc %' OR dose.FullDoseInstruction LIKE '% cc/%' OR 
                   dose.FullDoseInstruction LIKE '% CC %' OR dose.FullDoseInstruction LIKE '% CC/%' THEN 'cc (Cubic Centimeter)' END,
-        CASE WHEN dose.FullDoseInstruction LIKE '%<%' THEN '< (Less Than)' END,
-        CASE WHEN dose.FullDoseInstruction LIKE '%>%' THEN '> (Greater Than)' END,
+        CASE WHEN dose.FullDoseInstruction LIKE '%<%' AND dose.FullDoseInstruction NOT LIKE '%<=%' THEN '< (Less Than)' END,
+        CASE WHEN dose.FullDoseInstruction LIKE '%>%' AND dose.FullDoseInstruction NOT LIKE '%>=%' THEN '> (Greater Than)' END,
         CASE WHEN dose.FullDoseInstruction LIKE '%≥%' THEN '≥ (Greater Than or Equal)' END,
         CASE WHEN dose.FullDoseInstruction LIKE '%≤%' THEN '≤ (Less Than or Equal)' END,
         CASE WHEN dose.FullDoseInstruction LIKE '%@%' THEN '@ (At Symbol)' END,
@@ -148,8 +148,8 @@ WHERE rx.Sig <> '.STK-MED'
     dose.FullDoseInstruction LIKE '% CC/%' OR
     
     -- Symbols
-    dose.FullDoseInstruction LIKE '%<%' OR
-    dose.FullDoseInstruction LIKE '%>%' OR
+    (dose.FullDoseInstruction LIKE '%<%' AND dose.FullDoseInstruction NOT LIKE '%<=%') OR
+    (dose.FullDoseInstruction LIKE '%>%' AND dose.FullDoseInstruction NOT LIKE '%>=%') OR
     dose.FullDoseInstruction LIKE '%≥%' OR
     dose.FullDoseInstruction LIKE '%≤%' OR
     dose.FullDoseInstruction LIKE '%@%' OR
