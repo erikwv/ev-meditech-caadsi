@@ -61,8 +61,8 @@ SELECT TOP 100
 
     -- Flagged abbreviation type (concatenated if multiple)
     CONCAT_WS(', ',
-        CASE WHEN dose.FullDoseInstruction LIKE '%[^A-Z]U[^A-Z]%' OR dose.FullDoseInstruction LIKE '% U %' THEN 'U (Unit)' END,
-        CASE WHEN dose.FullDoseInstruction LIKE '%[^A-Z]IU[^A-Z]%' OR dose.FullDoseInstruction LIKE '% IU %' THEN 'IU (International Unit)' END,
+        CASE WHEN dose.FullDoseInstruction LIKE '% U %' OR dose.FullDoseInstruction LIKE '% U/%' THEN 'U (Unit)' END,
+        CASE WHEN dose.FullDoseInstruction LIKE '% IU %' OR dose.FullDoseInstruction LIKE '% IU/%' THEN 'IU (International Unit)' END,
         CASE WHEN dose.FullDoseInstruction LIKE '%ug %' OR dose.FullDoseInstruction LIKE '%ug/%' THEN 'ug (Microgram)' END,
         CASE WHEN dose.FullDoseInstruction LIKE '%cc %' OR dose.FullDoseInstruction LIKE '%cc/%' OR dose.FullDoseInstruction LIKE '%CC %' OR dose.FullDoseInstruction LIKE '%CC/%' THEN 'cc (Cubic Centimeter)' END
     ) AS [Flagged Abbreviation]
@@ -112,10 +112,10 @@ WHERE rx.Sig <> '.STK-MED'
 -- Filter for unapproved medical abbreviations in Dose Instructions
   AND (
     -- U or IU (unit abbreviations)
-    dose.FullDoseInstruction LIKE '%[^A-Z]U[^A-Z]%' OR
     dose.FullDoseInstruction LIKE '% U %' OR
-    dose.FullDoseInstruction LIKE '%[^A-Z]IU[^A-Z]%' OR
+    dose.FullDoseInstruction LIKE '% U/%' OR
     dose.FullDoseInstruction LIKE '% IU %' OR
+    dose.FullDoseInstruction LIKE '% IU/%' OR
     
     -- ug (microgram)
     dose.FullDoseInstruction LIKE '%ug %' OR
