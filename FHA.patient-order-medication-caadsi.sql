@@ -106,6 +106,9 @@ LEFT JOIN CombinedDoseInstructions AS dose
 
 -- Filters
 WHERE rx.Sig <> '.STK-MED'
+  -- Filter for last calendar year
+  AND rx.EnterDate >= DATEFROMPARTS(YEAR(GETDATE()) - 1, 1, 1)
+  AND rx.EnterDate < DATEFROMPARTS(YEAR(GETDATE()), 1, 1)
 -- Filter for unapproved medical abbreviations in Dose Instructions
   AND (
     -- U or IU (unit abbreviations)
