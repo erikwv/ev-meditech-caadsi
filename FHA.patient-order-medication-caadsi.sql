@@ -70,7 +70,8 @@ SELECT TOP 100
         CASE WHEN dose.FullDoseInstruction LIKE '%>%' THEN '> (Greater Than)' END,
         CASE WHEN dose.FullDoseInstruction LIKE '%≥%' THEN '≥ (Greater Than or Equal)' END,
         CASE WHEN dose.FullDoseInstruction LIKE '%≤%' THEN '≤ (Less Than or Equal)' END,
-        CASE WHEN dose.FullDoseInstruction LIKE '%@%' THEN '@ (At Symbol)' END
+        CASE WHEN dose.FullDoseInstruction LIKE '%@%' THEN '@ (At Symbol)' END,
+        CASE WHEN dose.FullDoseInstruction LIKE '%D/C%' OR dose.FullDoseInstruction LIKE '%d/c%' THEN 'D/C (Discharge/Discontinue)' END
     ) AS [Flagged Abbreviation]
 
 FROM FHA_ANALYTICS.FHA.F_MeditechPHARxMain AS rx
@@ -138,5 +139,9 @@ WHERE rx.Sig <> '.STK-MED'
     dose.FullDoseInstruction LIKE '%>%' OR
     dose.FullDoseInstruction LIKE '%≥%' OR
     dose.FullDoseInstruction LIKE '%≤%' OR
-    dose.FullDoseInstruction LIKE '%@%'
+    dose.FullDoseInstruction LIKE '%@%' OR
+    
+    -- D/C (discharge/discontinue)
+    dose.FullDoseInstruction LIKE '%D/C%' OR
+    dose.FullDoseInstruction LIKE '%d/c%'
   )
