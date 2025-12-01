@@ -69,8 +69,6 @@ SELECT TOP 100
                   dose.FullDoseInstruction LIKE '%[0-9]CC %' OR dose.FullDoseInstruction LIKE '%[0-9]CC/%' OR 
                   dose.FullDoseInstruction LIKE '% cc %' OR dose.FullDoseInstruction LIKE '% cc/%' OR 
                   dose.FullDoseInstruction LIKE '% CC %' OR dose.FullDoseInstruction LIKE '% CC/%' THEN 'cc (Cubic Centimeter)' END,
-        CASE WHEN dose.FullDoseInstruction LIKE '%≥%' THEN '≥ (Greater Than or Equal)' END,
-        CASE WHEN dose.FullDoseInstruction LIKE '%≤%' THEN '≤ (Less Than or Equal)' END,
         CASE WHEN dose.FullDoseInstruction LIKE '%@%' THEN '@ (At Symbol)' END,
         CASE WHEN dose.FullDoseInstruction LIKE '%D/C%' OR dose.FullDoseInstruction LIKE '%d/c%' THEN 'D/C (Discharge/Discontinue)' END,
         CASE WHEN dose.FullDoseInstruction LIKE '% OD %' OR dose.FullDoseInstruction LIKE '% od %' THEN 'OD (Once Daily)' END,
@@ -146,8 +144,6 @@ WHERE rx.Sig <> '.STK-MED'
     dose.FullDoseInstruction LIKE '% CC/%' OR
     
     -- Symbols
-    dose.FullDoseInstruction LIKE '%≥%' OR
-    dose.FullDoseInstruction LIKE '%≤%' OR
     dose.FullDoseInstruction LIKE '%@%' OR
     
     -- D/C (discharge/discontinue)
