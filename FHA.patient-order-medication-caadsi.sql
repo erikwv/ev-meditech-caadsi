@@ -8,69 +8,15 @@ WITH Forbidden AS (
     SELECT ' IU ', 'IU (International Unit)' UNION ALL
     SELECT ' IU/', 'IU (International Unit)' UNION ALL
 
-    -- Micrograms (must follow a digit)
-    SELECT '0ug ', 'ug (Microgram)' UNION ALL
-    SELECT '1ug ', 'ug (Microgram)' UNION ALL
-    SELECT '2ug ', 'ug (Microgram)' UNION ALL
-    SELECT '3ug ', 'ug (Microgram)' UNION ALL
-    SELECT '4ug ', 'ug (Microgram)' UNION ALL
-    SELECT '5ug ', 'ug (Microgram)' UNION ALL
-    SELECT '6ug ', 'ug (Microgram)' UNION ALL
-    SELECT '7ug ', 'ug (Microgram)' UNION ALL
-    SELECT '8ug ', 'ug (Microgram)' UNION ALL
-    SELECT '9ug ', 'ug (Microgram)' UNION ALL
-    SELECT '0ug/', 'ug (Microgram)' UNION ALL
-    SELECT '1ug/', 'ug (Microgram)' UNION ALL
-    SELECT '2ug/', 'ug (Microgram)' UNION ALL
-    SELECT '3ug/', 'ug (Microgram)' UNION ALL
-    SELECT '4ug/', 'ug (Microgram)' UNION ALL
-    SELECT '5ug/', 'ug (Microgram)' UNION ALL
-    SELECT '6ug/', 'ug (Microgram)' UNION ALL
-    SELECT '7ug/', 'ug (Microgram)' UNION ALL
-    SELECT '8ug/', 'ug (Microgram)' UNION ALL
-    SELECT '9ug/', 'ug (Microgram)' UNION ALL
+    -- Micrograms (patterns for PATINDEX matching)
+    SELECT '%[0-9]ug %', 'ug (Microgram)' UNION ALL
+    SELECT '%[0-9]ug/%', 'ug (Microgram)' UNION ALL
 
-    -- Cubic centimeters (must follow a digit)
-    SELECT '0cc ', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '1cc ', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '2cc ', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '3cc ', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '4cc ', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '5cc ', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '6cc ', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '7cc ', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '8cc ', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '9cc ', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '0cc/', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '1cc/', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '2cc/', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '3cc/', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '4cc/', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '5cc/', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '6cc/', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '7cc/', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '8cc/', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '9cc/', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '0CC ', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '1CC ', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '2CC ', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '3CC ', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '4CC ', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '5CC ', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '6CC ', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '7CC ', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '8CC ', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '9CC ', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '0CC/', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '1CC/', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '2CC/', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '3CC/', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '4CC/', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '5CC/', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '6CC/', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '7CC/', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '8CC/', 'cc (Cubic Centimeter)' UNION ALL
-    SELECT '9CC/', 'cc (Cubic Centimeter)' UNION ALL
+    -- Cubic centimeters (patterns for PATINDEX matching)
+    SELECT '%[0-9]cc %', 'cc (Cubic Centimeter)' UNION ALL
+    SELECT '%[0-9]cc/%', 'cc (Cubic Centimeter)' UNION ALL
+    SELECT '%[0-9]CC %', 'cc (Cubic Centimeter)' UNION ALL
+    SELECT '%[0-9]CC/%', 'cc (Cubic Centimeter)' UNION ALL
 
     -- Unicode symbols (exact binary match via codepoints)
     SELECT NCHAR(8805), '≥ (Greater Than or Equal)' UNION ALL   -- ≥
@@ -183,7 +129,11 @@ LEFT JOIN CombinedDoseInstructions dose
 CROSS APPLY (
     SELECT STRING_AGG(f.Meaning, ', ') AS Flagged
     FROM Forbidden f
-    WHERE CHARINDEX(f.Pattern, dose.FullDoseInstruction) > 0
+    WHERE 
+        CASE 
+            WHEN f.Pattern LIKE '%[[]%' THEN PATINDEX(f.Pattern, dose.FullDoseInstruction)
+            ELSE CHARINDEX(f.Pattern, dose.FullDoseInstruction)
+        END > 0
 ) flags
 
 WHERE rx.Sig <> '.STK-MED'
