@@ -122,7 +122,9 @@ SELECT TOP 100
     label.FullLabelComment AS [Label Comment],
     dose.FullDoseInstruction AS [Dose Instructions],
 
-    flags.Flagged AS [Flagged Abbreviation]
+    flags.Flagged AS [Flagged Abbreviation],
+    flags.FlaggedInDose AS [Flagged in Dose],
+    flags.FlaggedInLabel AS [Flagged in Label]
 
 FROM FHA_ANALYTICS.FHA.F_MeditechPHARxMain rx
 
@@ -160,7 +162,18 @@ LEFT JOIN CombinedDoseInstructions dose
    AND dose.SYSSystemID COLLATE DATABASE_DEFAULT = rx.SYSSystemID COLLATE DATABASE_DEFAULT
 
 CROSS APPLY (
-    SELECT STRING_AGG(f.Meaning, ', ') AS Flagged
+    SELECT 
+        STRING_AGG(f.Meaning, ', ') AS Flagged,
+        STRING_AGG(CASE 
+            WHEN (f.MatchType = 'CHAR' AND CHARINDEX(f.Pattern, dose.FullDoseInstruction) > 0) OR
+                 (f.MatchType = 'PAT' AND PATINDEX(f.Pattern, dose.FullDoseInstruction) > 0)
+            THEN f.Meaning 
+        END, ', ') AS FlaggedInDose,
+        STRING_AGG(CASE 
+            WHEN (f.MatchType = 'CHAR' AND CHARINDEX(f.Pattern, label.FullLabelComment) > 0) OR
+                 (f.MatchType = 'PAT' AND PATINDEX(f.Pattern, label.FullLabelComment) > 0)
+            THEN f.Meaning 
+        END, ', ') AS FlaggedInLabel
     FROM Forbidden f
     WHERE
         (
