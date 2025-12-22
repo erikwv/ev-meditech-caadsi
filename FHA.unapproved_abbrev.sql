@@ -186,9 +186,13 @@ CROSS APPLY (
     SELECT STRING_AGG(f.Meaning, ', ') AS Flagged
     FROM Forbidden f
     WHERE
-        (f.MatchType = 'CHAR' AND CHARINDEX(f.Pattern, dose.FullDoseInstruction) > 0)
+        (f.MatchType = 'CHAR' AND 
+         (CHARINDEX(f.Pattern, dose.FullDoseInstruction) > 0 OR 
+          CHARINDEX(f.Pattern, label.FullLabelComment) > 0))
         OR
-        (f.MatchType = 'PAT'  AND PATINDEX(f.Pattern, dose.FullDoseInstruction) > 0)
+        (f.MatchType = 'PAT' AND 
+         (PATINDEX(f.Pattern, dose.FullDoseInstruction) > 0 OR 
+          PATINDEX(f.Pattern, label.FullLabelComment) > 0))
 ) flags
 
 WHERE rx.Sig <> '.STK-MED'

@@ -165,12 +165,14 @@ CROSS APPLY (
     WHERE
         (
             f.MatchType = 'CHAR'
-            AND CHARINDEX(f.Pattern, dose.FullDoseInstruction) > 0
+            AND (CHARINDEX(f.Pattern, dose.FullDoseInstruction) > 0 OR
+                 CHARINDEX(f.Pattern, label.FullLabelComment) > 0)
         )
         OR
         (
             f.MatchType = 'PAT'
-            AND PATINDEX(f.Pattern, dose.FullDoseInstruction) > 0
+            AND (PATINDEX(f.Pattern, dose.FullDoseInstruction) > 0 OR
+                 PATINDEX(f.Pattern, label.FullLabelComment) > 0)
         )
 ) flags
 
