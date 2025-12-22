@@ -1,0 +1,19 @@
+DO NOT USE,ALWAYS USE
+U,Use units
+IU,Use International units
+"ug, µg",Use microgram or mcg
+cc,Use millilitre or mL
+"OD, QD",Use daily
+"QOD, EOD",Use every other day
+"D, d",Use days or doses
+"x/7, y/52","Use x days, y weeks"
+"AS, AD, AU","Use left ear, right ear, both ears"
+"OS, OD, OU","Use left eye, right eye, both eyes"
+< >,Use less than, lower than or more than, greater than
+@,Use at
+D/C,"Use discharge when referring to a discharge with medications from a care area. Where discontinue is intended, stop or discontinue may be safer alternatives."
+"medication A, medication B","Use the intended Arabic numerals, or spell out the numeral."
+"I, II, III, IV","Use the intended Arabic numerals, or spell out the numeral."
+"Ṫ, ṪṪ, ṪṪṪ","Use the intended Arabic numerals, or spell out the numeral."
+X.0 (trailing zero),Use X. Never use zeroes after a decimal point.
+.X (lack of leading zero),Use 0.X. Always use a zero before a decimal point.
