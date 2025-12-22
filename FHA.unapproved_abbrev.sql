@@ -118,9 +118,6 @@ CombinedDoseInstructions AS (
 )
 
 SELECT TOP 100
-    -- pat.UnitNumber AS Account,
-    -- pat.AcctNumber AS MRN,
-
     site.Mnemonic AS Site,
     CASE WHEN rx.SYSSystemID = 'MC' THEN 'CS' ELSE rx.SYSSystemID END AS [System],
 
@@ -131,24 +128,24 @@ SELECT TOP 100
     rx.StopDate,
     rx.Physician     AS [Provider],
 
-    drug_main.Mnemonic        AS [Drug Mnemonic],
-    drug_main5.DrugId         AS [Generic Name],
-    drug_main.NdcDinNumber    AS [DIN],
+    drug_main.Mnemonic     AS [Drug Mnemonic],
+    drug_main5.DrugId      AS [Generic Name],
+    drug_main.NdcDinNumber AS [DIN],
 
     med.Dose,
     rd.RangeDoseLow,
     rd.RangeDoseHigh,
     rx.Schedule,
 
-    drug_main.DispenseUnit   AS [Dose Unit],
-    drug_main.DispenseForm   AS [Dosage Form],
+    drug_main.DispenseUnit AS [Dose Unit],
+    drug_main.DispenseForm AS [Dosage Form],
     rx.Route,
-    rx.Sig                   AS [Frequency],
+    rx.Sig                 AS [Frequency],
 
     label.FullLabelComment   AS [Label Comment],
     dose.FullDoseInstruction AS [Dose Instructions],
 
-    flags.Flagged            AS [Flagged Abbreviation]
+    flags.Flagged AS [Flagged Abbreviation]
 
 FROM FHA_ANALYTICS.FHA.F_MeditechPHARxMain rx
 
@@ -198,4 +195,6 @@ WHERE rx.Sig <> '.STK-MED'
   AND rx.EnterDate >= @StartDate
   AND rx.EnterDate <  @EndDate
   AND flags.Flagged IS NOT NULL
-  AND dose.FullDoseInstruction NOT LIKE '%Antithrombin III%';
+  AND dose.FullDoseInstruction NOT LIKE '%Antithrombin III%'
+  AND dose.FullDoseInstruction NOT LIKE '%Level II%'
+  AND dose.FullDoseInstruction NOT LIKE '%Level III%';

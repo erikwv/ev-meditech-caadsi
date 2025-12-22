@@ -165,6 +165,8 @@ CROSS APPLY (
 **Exclusions**:
 - `rx.Sig <> '.STK-MED'` - Excludes stock medication records
 - `dose.FullDoseInstruction NOT LIKE '%Antithrombin III%'` - Excludes legitimate "III" usage in medication name
+- `dose.FullDoseInstruction NOT LIKE '%Level II%'` - Excludes burn/trauma level classifications
+- `dose.FullDoseInstruction NOT LIKE '%Level III%'` - Excludes burn/trauma level classifications
 
 **Date Range**:
 ```sql
