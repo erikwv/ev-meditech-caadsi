@@ -120,18 +120,56 @@ CombinedDoseInstructions AS (
 SELECT TOP 100
     -- pat.UnitNumber AS Account,
     -- pat.AcctNumber AS MRN,
+
     site.Mnemonic AS Site,
-    -- pat.Location,
-    rx.Number AS [Order Number],
-    rx.EnterDate,
-    label.FullLabelComment AS [Label Comment],
+    CASE WHEN rx.SYSSystemID = 'MC' THEN 'CS' ELSE rx.SYSSystemID END AS [System],
+
+    rx.Number        AS [Order Number],
+    rx.EnterDate     AS [Order Entered],
+    rx.OrderType     AS [Order Type],
+    rx.StartDate,
+    rx.StopDate,
+    rx.Physician     AS [Provider],
+
+    drug_main.Mnemonic        AS [Drug Mnemonic],
+    drug_main5.DrugId         AS [Generic Name],
+    drug_main.NdcDinNumber    AS [DIN],
+
+    med.Dose,
+    rd.RangeDoseLow,
+    rd.RangeDoseHigh,
+    rx.Schedule,
+
+    drug_main.DispenseUnit   AS [Dose Unit],
+    drug_main.DispenseForm   AS [Dosage Form],
+    rx.Route,
+    rx.Sig                   AS [Frequency],
+
+    label.FullLabelComment   AS [Label Comment],
     dose.FullDoseInstruction AS [Dose Instructions],
-    flags.Flagged AS [Flagged Abbreviation]
+
+    flags.Flagged            AS [Flagged Abbreviation]
 
 FROM FHA_ANALYTICS.FHA.F_MeditechPHARxMain rx
 
 JOIN FHA_ANALYTICS.FHA.F_MeditechADMPatMain pat
   ON rx.Patient COLLATE DATABASE_DEFAULT = pat.Urn COLLATE DATABASE_DEFAULT
+
+JOIN FHA_ANALYTICS.FHA.F_MeditechADMPatCanadaRecall recall
+  ON recall.Urn COLLATE DATABASE_DEFAULT = pat.Urn COLLATE DATABASE_DEFAULT
+
+JOIN FHA_ANALYTICS.FHA.F_MeditechPHARxInpatientMedications med
+  ON med.Urn COLLATE DATABASE_DEFAULT = rx.Urn COLLATE DATABASE_DEFAULT
+
+JOIN FHA_ANALYTICS.FHA.D_MeditechPHADrugMain drug_main
+  ON drug_main.Mnemonic COLLATE DATABASE_DEFAULT = med.Med COLLATE DATABASE_DEFAULT
+
+JOIN FHA_ANALYTICS.FHA.D_MeditechPHADrugMain5 drug_main5
+  ON drug_main5.Mnemonic COLLATE DATABASE_DEFAULT = med.Med COLLATE DATABASE_DEFAULT
+
+LEFT JOIN FHA_ANALYTICS.FHA.F_MeditechPHARxRangeDoses rd
+  ON rd.Urn COLLATE DATABASE_DEFAULT = rx.Urn COLLATE DATABASE_DEFAULT
+ AND rd.SYSSystemID COLLATE DATABASE_DEFAULT = rx.SYSSystemID COLLATE DATABASE_DEFAULT
 
 JOIN FHA_ANALYTICS.FHA.D_MeditechMISLocnMain loc
   ON loc.Mnemonic COLLATE DATABASE_DEFAULT = pat.Location COLLATE DATABASE_DEFAULT
