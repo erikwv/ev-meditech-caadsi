@@ -182,18 +182,18 @@ LEFT JOIN CombinedDoseInstructions dose
 
 CROSS APPLY (
     SELECT 
-        STRING_AGG(DISTINCT Meaning, ', ') WITHIN GROUP (ORDER BY Meaning) AS Flagged,
-        STRING_AGG(DISTINCT CASE WHEN InDose = 1 THEN Meaning END, ', ') WITHIN GROUP (ORDER BY Meaning) AS FlaggedInDose,
-        STRING_AGG(DISTINCT CASE WHEN InLabel = 1 THEN Meaning END, ', ') WITHIN GROUP (ORDER BY Meaning) AS FlaggedInLabel
+        STRING_AGG(Meaning, ', ') AS Flagged,
+        STRING_AGG(CASE WHEN InDose = 1 THEN Meaning END, ', ') AS FlaggedInDose,
+        STRING_AGG(CASE WHEN InLabel = 1 THEN Meaning END, ', ') AS FlaggedInLabel
     FROM (
         SELECT DISTINCT
             f.Meaning,
-            CASE WHEN (f.MatchType = 'CHAR' AND CHARINDEX(f.Pattern, dose.FullDoseInstruction) > 0) OR
-                      (f.MatchType = 'PAT' AND PATINDEX(f.Pattern, dose.FullDoseInstruction) > 0)
-                 THEN 1 ELSE 0 END AS InDose,
-            CASE WHEN (f.MatchType = 'CHAR' AND CHARINDEX(f.Pattern, label.FullLabelComment) > 0) OR
-                      (f.MatchType = 'PAT' AND PATINDEX(f.Pattern, label.FullLabelComment) > 0)
-                 THEN 1 ELSE 0 END AS InLabel
+            MAX(CASE WHEN (f.MatchType = 'CHAR' AND CHARINDEX(f.Pattern, dose.FullDoseInstruction) > 0) OR
+                          (f.MatchType = 'PAT' AND PATINDEX(f.Pattern, dose.FullDoseInstruction) > 0)
+                     THEN 1 ELSE 0 END) AS InDose,
+            MAX(CASE WHEN (f.MatchType = 'CHAR' AND CHARINDEX(f.Pattern, label.FullLabelComment) > 0) OR
+                          (f.MatchType = 'PAT' AND PATINDEX(f.Pattern, label.FullLabelComment) > 0)
+                     THEN 1 ELSE 0 END) AS InLabel
         FROM Forbidden f
         WHERE
             (f.MatchType = 'CHAR' AND 
@@ -203,6 +203,7 @@ CROSS APPLY (
             (f.MatchType = 'PAT' AND 
              (PATINDEX(f.Pattern, dose.FullDoseInstruction) > 0 OR 
               PATINDEX(f.Pattern, label.FullLabelComment) > 0))
+        GROUP BY f.Meaning
     ) matches
 ) flags
 
