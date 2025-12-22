@@ -97,6 +97,16 @@ WITH Forbidden (MatchType, Pattern, Meaning) AS (
     SELECT 'PAT', '%[0-9]d %', 'd (Days/Doses)'
 ),
 
+CombinedLabelComments AS (
+    SELECT 
+        URN,
+        SYSSystemID,
+        STRING_AGG(LabelComment, CHAR(10))
+            WITHIN GROUP (ORDER BY LabelCommentQ) AS FullLabelComment
+    FROM FHA_ANALYTICS.FHA.F_MeditechPHARxLabelComments
+    GROUP BY URN, SYSSystemID
+),
+
 CombinedDoseInstructions AS (
     SELECT 
         URN,
@@ -114,16 +124,25 @@ SELECT TOP 100
     -- pat.Location,
     rx.Number AS [Order Number],
     rx.EnterDate,
-    dose.FullDoseInstruction,
-    flags.Flagged
+    label.FullLabelComment AS [Label Comment],
+    dose.FullDoseInstruction AS [Dose Instructions],
+    flags.Flagged AS [Flagged Abbreviation]
 
 FROM FHA_ANALYTICS.FHA.F_MeditechPHARxMain rx
+
 JOIN FHA_ANALYTICS.FHA.F_MeditechADMPatMain pat
   ON rx.Patient COLLATE DATABASE_DEFAULT = pat.Urn COLLATE DATABASE_DEFAULT
+
 JOIN FHA_ANALYTICS.FHA.D_MeditechMISLocnMain loc
   ON loc.Mnemonic COLLATE DATABASE_DEFAULT = pat.Location COLLATE DATABASE_DEFAULT
+
 JOIN FHA_ANALYTICS.FHA.D_MeditechPHASiteDictionary site
   ON site.Mnemonic COLLATE DATABASE_DEFAULT = loc.OeSite COLLATE DATABASE_DEFAULT
+
+LEFT JOIN CombinedLabelComments label
+  ON label.URN COLLATE DATABASE_DEFAULT = rx.Urn COLLATE DATABASE_DEFAULT
+ AND label.SYSSystemID COLLATE DATABASE_DEFAULT = rx.SYSSystemID COLLATE DATABASE_DEFAULT
+
 LEFT JOIN CombinedDoseInstructions dose
   ON dose.URN COLLATE DATABASE_DEFAULT = rx.Urn COLLATE DATABASE_DEFAULT
  AND dose.SYSSystemID COLLATE DATABASE_DEFAULT = rx.SYSSystemID COLLATE DATABASE_DEFAULT
