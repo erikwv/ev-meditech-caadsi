@@ -9,10 +9,10 @@ This repository contains SQL queries and documentation for extracting and analyz
 ## Project Structure
 
 ### Core Query Files
-- **FHA.patient-order-medication-caadsi.sql** - Base CAADSI-compliant medication order query with abbreviation detection
-- **FHA.unapproved_abbrev.sql** - Comprehensive ISMP Canada Do Not Use abbreviations detection (frozen v1.0)
-- **FHA.unap_abbrev-roman_num.sql** - Isolated test query for Roman numeral detection
-- **FHA.unap_abbrev-dot_eye_day_week.sql** - Isolated test query for edge-case ISMP items
+- **FHA.unapproved_abbrev.sql** - Primary ISMP safety monitoring query (89-94% coverage, de-identified output)
+- **FHA.patient-order-medication-caadsi.sql** - Full CAADSI medication order query with patient identifiers (72% ISMP coverage)
+- **FHA.unap_abbrev-roman_num.sql** - Isolated Roman numeral testing query
+- **FHA.unap_abbrev-dot_eye_day_week.sql** - Edge-case ISMP items testing query
 
 ### Directories
 - **HDPBC Queries/** - High-Dose Parenteral B12 (HDPBC) related queries
@@ -32,7 +32,17 @@ This repository contains SQL queries and documentation for extracting and analyz
 ## Key Features
 
 ### Unapproved Abbreviations Detection
-The primary query (`FHA.unapproved_abbrev.sql`) identifies medication orders containing dangerous abbreviations that violate ISMP Canada safety standards:
+Two complementary queries identify medication orders containing dangerous abbreviations:
+
+**Primary Safety Query** (`FHA.unapproved_abbrev.sql`):
+- De-identified output (Account/MRN/Location commented out)
+- Parameterized date range for flexible reporting
+- Near-complete ISMP coverage (89-94%)
+
+**Full Clinical Query** (`FHA.patient-order-medication-caadsi.sql`):
+- Includes patient identifiers for clinical follow-up
+- Extended ISMP coverage (72%)
+- Suitable for direct patient care intervention
 
 **Currently Detected (16-17 of 18 ISMP items)**:
 - Unit abbreviations: U, IU, ug/µg, cc
@@ -81,9 +91,12 @@ Evolved through 25+ commits with refinements:
 
 ### Running Queries
 ```sql
--- Detect unapproved abbreviations in previous calendar year
--- Returns up to 100 flagged orders with patient, medication, and order details
+-- Primary safety monitoring query (de-identified)
+-- Returns up to 100 flagged orders from previous calendar year
 EXEC FHA.unapproved_abbrev.sql
+
+-- Full clinical query with patient identifiers
+EXEC FHA.patient-order-medication-caadsi.sql
 ```
 
 ### Output Columns

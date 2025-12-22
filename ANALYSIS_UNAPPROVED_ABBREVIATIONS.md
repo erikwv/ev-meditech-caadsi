@@ -15,9 +15,10 @@
 ## Project Structure
 
 ### Core Query Files
-- **FHA.unapproved_abbrev.sql** - Main unapproved abbreviations detection query
-- **FHA.patient-order-medication-caadsi.sql** - Base medication order query (CAADSI compliant)
-- **FHA.order_sample_steven.sql** - Sample order query
+- **FHA.unapproved_abbrev.sql** - Comprehensive ISMP Canada Do Not Use abbreviations detection query
+- **FHA.patient-order-medication-caadsi.sql** - CAADSI-compliant medication order query with full abbreviation detection
+- **FHA.unap_abbrev-roman_num.sql** - Isolated Roman numeral testing query
+- **FHA.unap_abbrev-dot_eye_day_week.sql** - Edge-case ISMP items testing query
 
 ### Supporting Directories
 - **HDPBC Queries/** - High-Dose Parenteral B12 (HDPBC) related queries
@@ -219,25 +220,53 @@ Filters to previous full calendar year (e.g., 2024 if run in 2025).
 
 ---
 
-## Base Query Comparison
+## Query Comparison
 
-The `FHA.patient-order-medication-caadsi.sql` query serves as the foundation and differs from the unapproved abbreviations query in:
+### Main Query: FHA.unapproved_abbrev.sql
+**Purpose**: Focused ISMP detection query for medication safety monitoring
 
-### Similarities
-- Identical CTE structure for aggregating label comments and dose instructions
-- Same table joins and relationships
-- Same collation handling
-- Same column output (excluding flagged abbreviations)
+**Key Features**:
+- Parameterized date range (`@StartDate`, `@EndDate`)
+- Account/MRN/Location commented out (privacy-focused output)
+- Full ISMP Canada 2025 Do Not Use List coverage (16-17 of 18 items)
+- Returns only flagged orders (`flags.Flagged IS NOT NULL`)
+- Excludes Antithrombin III false positives
+- TOP 100 result limit
+
+**Output Columns** (18 total):
+- Site, System
+- Order Number, Order Entered, Order Type, StartDate, StopDate, Provider
+- Drug Mnemonic, Generic Name, DIN
+- Dose, RangeDoseLow, RangeDoseHigh, Schedule
+- Dose Unit, Dosage Form, Route, Frequency
+- Label Comment, Dose Instructions
+- Flagged Abbreviation
+
+### Base Query: FHA.patient-order-medication-caadsi.sql
+**Purpose**: Full CAADSI-compliant medication order query with abbreviation detection
+
+**Key Features**:
+- Includes patient identifiers (Account, MRN, Location)
+- Partial ISMP coverage (missing eye routes, time notation, days/doses, dot notation)
+- Same date filter approach (computed in WHERE clause)
+- Returns only flagged orders
+- Excludes Antithrombin III false positives
+- TOP 100 result limit
+
+**Output Columns** (23 total):
+- All fields from main query PLUS:
+- Account, MRN, Location
 
 ### Key Differences
-1. **No abbreviation detection** - Missing the `Forbidden` CTE and `CROSS APPLY` logic
-2. **No date filtering** - No restriction to previous calendar year
-3. **No flagged column** - Does not include `[Flagged Abbreviation]` output
-4. **Different filter** - Includes commented-out drug mnemonic filter:
-   ```sql
-   -- AND drug_main.Mnemonic IN ('POTCH1.5T', 'SALIPH', 'MAGICL', 'SALBU100H', 'IPRAT20H')
-   ```
-5. **No positive-match requirement** - Returns all orders (up to TOP 100)
+
+| Feature | FHA.unapproved_abbrev.sql | FHA.patient-order-medication-caadsi.sql |
+|---------|---------------------------|------------------------------------------|
+| **ISMP Coverage** | 16-17 of 18 items (89-94%) | 13 of 18 items (72%) |
+| **Patient ID** | Commented out | Included |
+| **Date Parameters** | @StartDate/@EndDate variables | Computed in WHERE clause |
+| **Missing ISMP Items** | I, IV only | I, IV, OS/OD/OU, x/7/y/52, D/d, Ṫ |
+| **Primary Use Case** | Safety monitoring (de-identified) | Full clinical review |
+| **Output Focus** | Clinical + safety | Clinical + patient tracking |
 
 ---
 
