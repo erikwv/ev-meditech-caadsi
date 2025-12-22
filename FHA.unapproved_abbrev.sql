@@ -90,11 +90,7 @@ WITH Forbidden (MatchType, Pattern, Meaning) AS (
 
     -- Time notation
     SELECT 'PAT', '%[0-9]/7%',  'x/7 (Days notation)' UNION ALL
-    SELECT 'PAT', '%[0-9]/52%', 'y/52 (Weeks notation)' UNION ALL
-
-    -- Days / doses
-    SELECT 'PAT', '%[0-9]D %', 'D (Days/Doses)' UNION ALL
-    SELECT 'PAT', '%[0-9]d %', 'd (Days/Doses)'
+    SELECT 'PAT', '%[0-9]/52%', 'y/52 (Weeks notation)'
 ),
 
 CombinedLabelComments AS (

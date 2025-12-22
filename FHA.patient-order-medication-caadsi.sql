@@ -72,7 +72,25 @@ WITH Forbidden (MatchType, Pattern, Meaning) AS (
     SELECT 'PAT', '%[ ]ii[ ][^.]%',  'Roman numeral ii (numeric representation)' UNION ALL
     SELECT 'PAT', '%[ ]II[ ][^.]%',  'Roman numeral II (numeric representation)' UNION ALL
     SELECT 'PAT', '%[ ]iii[ ][^.]%', 'Roman numeral iii (numeric representation)' UNION ALL
-    SELECT 'PAT', '%[ ]III[ ][^.]%', 'Roman numeral III (numeric representation)'
+    SELECT 'PAT', '%[ ]III[ ][^.]%', 'Roman numeral III (numeric representation)' UNION ALL
+
+    -- Eye abbreviations
+    SELECT 'PAT', '%[0-9]OS %',  'OS (Left Eye)' UNION ALL
+    SELECT 'PAT', '%[0-9] OS %', 'OS (Left Eye)' UNION ALL
+    SELECT 'PAT', '%[0-9]OD %',  'OD (Right Eye)' UNION ALL
+    SELECT 'PAT', '%[0-9] OD %', 'OD (Right Eye)' UNION ALL
+    SELECT 'PAT', '%[0-9]OU %',  'OU (Both Eyes)' UNION ALL
+    SELECT 'PAT', '%[0-9] OU %', 'OU (Both Eyes)' UNION ALL
+
+    -- Dot / tally notation
+    SELECT 'CHAR', NCHAR(7786),                              'Ṫ (Numeric tally notation)' UNION ALL
+    SELECT 'CHAR', NCHAR(7786) + NCHAR(7786),               'ṪṪ (Numeric tally notation)' UNION ALL
+    SELECT 'CHAR', NCHAR(7786) + NCHAR(7786) + NCHAR(7786), 'ṪṪṪ (Numeric tally notation)' UNION ALL
+    SELECT 'CHAR', NCHAR(7787),                              'ṫ (Numeric tally notation)' UNION ALL
+
+    -- Time notation
+    SELECT 'PAT', '%[0-9]/7%',  'x/7 (Days notation)' UNION ALL
+    SELECT 'PAT', '%[0-9]/52%', 'y/52 (Weeks notation)'
 ),
 
 CombinedLabelComments AS (
