@@ -9,9 +9,10 @@ This repository contains SQL queries and documentation for extracting and analyz
 ## Project Structure
 
 ### Core Query Files
-- **FHA.patient-order-medication-caadsi.sql** - Base CAADSI-compliant medication order query
-- **FHA.unapproved_abbrev.sql** - Detects ISMP Canada Do Not Use abbreviations in dose instructions
-- **FHA.unapproved_abbrev-only_roman_num.sql** - Test query for Roman numeral detection
+- **FHA.patient-order-medication-caadsi.sql** - Base CAADSI-compliant medication order query with abbreviation detection
+- **FHA.unapproved_abbrev.sql** - Comprehensive ISMP Canada Do Not Use abbreviations detection (frozen v1.0)
+- **FHA.unap_abbrev-roman_num.sql** - Isolated test query for Roman numeral detection
+- **FHA.unap_abbrev-dot_eye_day_week.sql** - Isolated test query for edge-case ISMP items
 
 ### Directories
 - **HDPBC Queries/** - High-Dose Parenteral B12 (HDPBC) related queries
@@ -33,17 +34,21 @@ This repository contains SQL queries and documentation for extracting and analyz
 ### Unapproved Abbreviations Detection
 The primary query (`FHA.unapproved_abbrev.sql`) identifies medication orders containing dangerous abbreviations that violate ISMP Canada safety standards:
 
-**Currently Detected (13 of 19 ISMP items)**:
+**Currently Detected (16-17 of 18 ISMP items)**:
 - Unit abbreviations: U, IU, ug/µg, cc
 - Frequency abbreviations: OD, QD, QOD, EOD
-- Ear route abbreviations: AS, AD, AU
+- Ear/Eye route abbreviations: AS, AD, AU, OS, OD, OU (numeric context)
 - Symbols: <, >, ≥, ≤, @
 - Clinical abbreviation: D/C
 - Numeric safety: Trailing zeros (X.0), Missing leading zeros (.X)
 - Ambiguous drug names: MS, MSO4, MgSO4
-- Roman numerals: II, III (with context filtering)
+- Roman numerals: II, III (I/IV excluded for safety)
+- Time notation: x/7, y/52
+- Days/Doses: D, d (numeric context)
+- Dot notation: Ṫ, ṪṪ, ṪṪṪ
 
-**Query Coverage**: 68% of official ISMP Canada Do Not Use List (2025)
+**Query Coverage**: 89-94% of official ISMP Canada Do Not Use List (2025)
+**Excluded by Design**: Roman numeral I (excessive false positives), Roman numeral IV (valid route)
 
 ### Data Sources
 - **Database**: FHA_ANALYTICS

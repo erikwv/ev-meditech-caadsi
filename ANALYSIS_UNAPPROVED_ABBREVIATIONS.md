@@ -308,40 +308,40 @@ The query detects abbreviations from the official **ISMP Canada Dangerous Abbrev
 | **cc** | Use millilitre or mL | ✅ Detected |
 | **OD, QD** | Use daily | ✅ Detected |
 | **QOD, EOD** | Use every other day | ✅ Detected |
-| **D, d** | Use days or doses | ❌ Not detected |
-| **x/7, y/52** | Use x days, y weeks | ❌ Not detected |
+| **D, d** | Use days or doses | ✅ Detected (numeric context) |
+| **x/7, y/52** | Use x days, y weeks | ✅ Detected |
 | **AS, AD, AU** | Use left ear, right ear, both ears | ✅ Detected |
-| **OS, OD, OU** | Use left eye, right eye, both eyes | ❌ Not detected |
+| **OS, OD, OU** | Use left eye, right eye, both eyes | ✅ Detected (numeric context) |
 | **< >** | Use less than, lower than or more than, greater than | ✅ Detected (includes ≥ ≤) |
 | **@** | Use at | ✅ Detected |
 | **D/C** | Use discharge when referring to a discharge with medications from a care area. Where discontinue is intended, stop or discontinue may be safer alternatives. | ✅ Detected |
 | **medication A, medication B** | Use the intended Arabic numerals, or spell out the numeral. | ✅ Detected (MS, MSO4, MgSO4) |
-| **I, II, III, IV, ...** | Use the intended Arabic numerals, or spell out the numeral. | ⚠️ Partial (II, III only) |
-| **Ṫ, ṪṪ, ṪṪṪ, ...** | Use the intended Arabic numerals, or spell out the numeral. | ❌ Not detected |
+| **I, II, III, IV, ...** | Use the intended Arabic numerals, or spell out the numeral. | ⚠️ Partial (II, III only; I/IV excluded) |
+| **Ṫ, ṪṪ, ṪṪṪ, ...** | Use the intended Arabic numerals, or spell out the numeral. | ✅ Detected |
 | **X.0** (trailing zero) | Use X. Never use zeroes after a decimal point. | ✅ Detected |
 | **.X** (lack of leading zero) | Use 0.X. Always use a zero before a decimal point. | ✅ Detected |
 
-**Query Coverage: 13 of 19 items (68%)**
+**Query Coverage: 16-17 of 18 items (89-94%)**
 
 ### Gap Analysis
 
-**Currently Detected (13 items)**:
+**Currently Detected (16-17 items)**:
 - Unit abbreviations: U, IU, ug/µg, cc
 - Frequency abbreviations: OD, QD, QOD, EOD
 - Ear route abbreviations: AS, AD, AU
+- Eye route abbreviations: OS, OD, OU (numeric context)
 - Symbols: <, >, ≥, ≤, @
 - Clinical abbreviation: D/C
 - Numeric safety: Trailing zeros (X.0), Missing leading zeros (.X)
 - Ambiguous drug names: MS, MSO4, MgSO4
 - Roman numerals: II, III (with context filtering)
+- Time notation: x/7, y/52
+- Days/Doses: D, d (numeric context)
+- Dot notation: Ṫ, ṪṪ, ṪṪṪ (Unicode 7786/7787)
 
-**Not Currently Detected (6 items)**:
-- Abbreviated medication names (generic - e.g., MTX for methotrexate)
-- Day/week notation: D, d, x/7, y/52
-- Eye route abbreviations: OS, OD, OU
-- Medication list format: "medication A, medication B"
-- Roman numeral: I (excluded due to false positives)
-- Dot notation: Ṫ, ṪṪ, ṪṪṪ
+**Not Currently Detected (1-2 items)**:
+- Roman numeral: I (excluded due to excessive false positives in prose)
+- Roman numeral: IV (valid route of administration - intentionally excluded)
 
 **Note**: Some items remain difficult to detect without causing excessive false positives:
 - **D, d** - Too common in normal text ("daily", "days", "medication")
