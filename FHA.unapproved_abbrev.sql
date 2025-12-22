@@ -37,9 +37,13 @@ WITH Forbidden (MatchType, Pattern, Meaning) AS (
     -- Symbol
     SELECT 'CHAR', '@', '@ (At Symbol)' UNION ALL
 
-    -- Discontinue
-    SELECT 'CHAR', 'D/C', 'D/C (Discontinue)' UNION ALL
-    SELECT 'CHAR', 'd/c', 'D/C (Discontinue)' UNION ALL
+    -- Discontinue (token-aware)
+	SELECT 'PAT', '% D/C %',  'D/C (Discontinue)' UNION ALL
+	SELECT 'PAT', '% d/c %',  'D/C (Discontinue)' UNION ALL
+	SELECT 'PAT', '% D/C.',   'D/C (Discontinue)' UNION ALL
+	SELECT 'PAT', '% d/c.',   'D/C (Discontinue)' UNION ALL
+	SELECT 'PAT', '% D/C,%',  'D/C (Discontinue)' UNION ALL
+	SELECT 'PAT', '% d/c,%',  'D/C (Discontinue)' UNION ALL
 
     -- Frequency abbreviations
     SELECT 'CHAR', ' OD ',  'OD (Once Daily)' UNION ALL
