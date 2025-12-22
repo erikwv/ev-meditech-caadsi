@@ -33,14 +33,17 @@ This repository contains SQL queries and documentation for extracting and analyz
 ### Unapproved Abbreviations Detection
 The primary query (`FHA.unapproved_abbrev.sql`) identifies medication orders containing dangerous abbreviations that violate ISMP Canada safety standards:
 
-**Currently Detected (9 of 19 ISMP items)**:
+**Currently Detected (13 of 19 ISMP items)**:
 - Unit abbreviations: U, IU, ug/µg, cc
 - Frequency abbreviations: OD, QD, QOD, EOD
 - Ear route abbreviations: AS, AD, AU
-- Symbols: <, >, @
+- Symbols: <, >, ≥, ≤, @
 - Clinical abbreviation: D/C
+- Numeric safety: Trailing zeros (X.0), Missing leading zeros (.X)
+- Ambiguous drug names: MS, MSO4, MgSO4
+- Roman numerals: II, III (with context filtering)
 
-**Query Coverage**: 47% of official ISMP Canada Do Not Use List (2025)
+**Query Coverage**: 68% of official ISMP Canada Do Not Use List (2025)
 
 ### Data Sources
 - **Database**: FHA_ANALYTICS

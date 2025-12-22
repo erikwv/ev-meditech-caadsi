@@ -65,10 +65,10 @@ Defines two pattern matching strategies:
 **Dosage Units**:
 - **U (Unit)** - Must follow digits, followed by space or slash
   - Patterns: `%[0-9]U %`, `%[0-9] U %`, `%[0-9]U/%`, `%[0-9] U/%`
-- **IU (International Unit)** - Space-bounded literal match
-  - Patterns: ` IU `, ` IU/`
-- **ug (Microgram)** - Multiple variations to catch common formats
-  - Patterns: ` ug `, ` ug/`, `ug `, `ug/`
+- **IU (International Unit)** - Must follow digits, followed by space or slash
+  - Patterns: `%[0-9]IU %`, `%[0-9] IU %`, `%[0-9]IU/%`, `%[0-9] IU/%`
+- **µg (Microgram symbol)** - Unicode character detection
+  - Pattern: `NCHAR(181) + 'g'` (matches µg symbol)
 - **cc (Cubic Centimeter)** - Must follow digits (case-insensitive), followed by space or slash
   - Patterns: `%[0-9]cc %`, `%[0-9] cc %`, `%[0-9]cc/%`, `%[0-9] cc/%` (plus CC variants)
 
@@ -90,6 +90,22 @@ Defines two pattern matching strategies:
 - **AS (Left Ear)** - Must follow digits
 - **AU (Both Ears)** - Must follow digits
 - Patterns require `%[0-9]AD %` format to avoid false matches
+
+**Numeric Safety Issues**:
+- **Trailing zero** (e.g., "1.0 mg") - Pattern: `%[0-9]\.0[^0-9]%`
+- **Missing leading zero** (e.g., ".5 mg") - Pattern: `%[^0-9]\.[0-9]%`
+
+**Ambiguous Drug Abbreviations**:
+- **MS** - Morphine vs Magnesium Sulfate confusion
+- **MSO4** - Morphine Sulfate vs Magnesium Sulfate
+- **MgSO4** - Magnesium Sulfate (can be confused with MSO4)
+- Patterns require non-letter boundaries: `%[^A-Za-z]MS[^A-Za-z]%`
+
+**Roman Numerals** (when used as numeric representations):
+- **ii, II** - Pattern: `%[ ]ii[ ][^.]%` (space-bounded, not before period)
+- **iii, III** - Pattern: `%[ ]iii[ ][^.]%`
+- **Note**: Excludes single "I" due to excessive false positives
+- **Exclusions**: "Level II", "Level III" filtered out to prevent false positives
 
 #### 3. **Data Aggregation CTEs**
 
@@ -147,6 +163,7 @@ CROSS APPLY (
 
 **Exclusions**:
 - `rx.Sig <> '.STK-MED'` - Excludes stock medication records
+- `dose.FullDoseInstruction NOT LIKE '%Antithrombin III%'` - Excludes legitimate "III" usage in medication name
 
 **Date Range**:
 ```sql
@@ -295,41 +312,43 @@ The query detects abbreviations from the official **ISMP Canada Dangerous Abbrev
 | **x/7, y/52** | Use x days, y weeks | ❌ Not detected |
 | **AS, AD, AU** | Use left ear, right ear, both ears | ✅ Detected |
 | **OS, OD, OU** | Use left eye, right eye, both eyes | ❌ Not detected |
-| **< >** | Use less than, lower than or more than, greater than | ✅ Detected |
+| **< >** | Use less than, lower than or more than, greater than | ✅ Detected (includes ≥ ≤) |
 | **@** | Use at | ✅ Detected |
 | **D/C** | Use discharge when referring to a discharge with medications from a care area. Where discontinue is intended, stop or discontinue may be safer alternatives. | ✅ Detected |
-| **medication A, medication B** | Use the intended Arabic numerals, or spell out the numeral. | ❌ Not detected |
-| **I, II, III, IV, ...** | Use the intended Arabic numerals, or spell out the numeral. | ❌ Not detected |
+| **medication A, medication B** | Use the intended Arabic numerals, or spell out the numeral. | ✅ Detected (MS, MSO4, MgSO4) |
+| **I, II, III, IV, ...** | Use the intended Arabic numerals, or spell out the numeral. | ⚠️ Partial (II, III only) |
 | **Ṫ, ṪṪ, ṪṪṪ, ...** | Use the intended Arabic numerals, or spell out the numeral. | ❌ Not detected |
-| **X.0** (trailing zero) | Use X. Never use zeroes after a decimal point. | ❌ Not detected |
-| **.X** (lack of leading zero) | Use 0.X. Always use a zero before a decimal point. | ❌ Not detected |
+| **X.0** (trailing zero) | Use X. Never use zeroes after a decimal point. | ✅ Detected |
+| **.X** (lack of leading zero) | Use 0.X. Always use a zero before a decimal point. | ✅ Detected |
 
-**Query Coverage: 9 of 19 items (47%)**
+**Query Coverage: 13 of 19 items (68%)**
 
 ### Gap Analysis
 
-**Currently Detected (9 items)**:
+**Currently Detected (13 items)**:
 - Unit abbreviations: U, IU, ug/µg, cc
 - Frequency abbreviations: OD, QD, QOD, EOD
 - Ear route abbreviations: AS, AD, AU
-- Symbols: <, >, @
+- Symbols: <, >, ≥, ≤, @
 - Clinical abbreviation: D/C
+- Numeric safety: Trailing zeros (X.0), Missing leading zeros (.X)
+- Ambiguous drug names: MS, MSO4, MgSO4
+- Roman numerals: II, III (with context filtering)
 
-**Not Currently Detected (10 items)**:
-- Abbreviated medication names (MSO4, MTX, etc.)
+**Not Currently Detected (6 items)**:
+- Abbreviated medication names (generic - e.g., MTX for methotrexate)
 - Day/week notation: D, d, x/7, y/52
 - Eye route abbreviations: OS, OD, OU
 - Medication list format: "medication A, medication B"
-- Roman numerals: I, II, III, IV
+- Roman numeral: I (excluded due to false positives)
 - Dot notation: Ṫ, ṪṪ, ṪṪṪ
-- Trailing zeros: X.0
-- Leading zero absence: .X
 
-**Note**: Some items are difficult to detect in free-text without context:
-- **D, d** - Too common in normal text
-- **OD** (eye) vs **OD** (once daily) - Ambiguous without context
-- **Trailing/leading zeros** - Require numeric parsing, not simple pattern matching
-- **Roman numerals** - Context-dependent (may be legitimate in some cases)
+**Note**: Some items remain difficult to detect without causing excessive false positives:
+- **D, d** - Too common in normal text ("daily", "days", "medication")
+- **OD** (eye) vs **OD** (once daily) - Ambiguous without anatomical context
+- **Roman numeral I** - Appears frequently in legitimate contexts (Vitamin I, Phase I, etc.)
+- **Dot notation (Ṫ)** - Rare in modern systems; minimal occurrence expected
+- **x/7, y/52** - Too complex for pattern matching without contextual numeric parsing
 
 ### Source Reference
 **Document**: ISMP Canada Dangerous Abbreviations, Symbols, and Dose Designations (©2025)  

@@ -1,11 +1,9 @@
 WITH Forbidden (MatchType, Pattern, Meaning) AS (
-    -- Roman numerals as numeric representations (ISMP test set for false positives)
-    SELECT 'PAT', '%[^A-Za-z]i[^A-Za-z]%',   'Roman numeral i (numeric representation)' UNION ALL
-    SELECT 'PAT', '%[^A-Za-z]I[^A-Za-z]%',   'Roman numeral I (numeric representation)' UNION ALL
-    SELECT 'PAT', '%[^A-Za-z]ii[^A-Za-z]%',  'Roman numeral ii (numeric representation)' UNION ALL
-    SELECT 'PAT', '%[^A-Za-z]II[^A-Za-z]%',  'Roman numeral II (numeric representation)' UNION ALL
-    SELECT 'PAT', '%[^A-Za-z]iii[^A-Za-z]%', 'Roman numeral iii (numeric representation)' UNION ALL
-    SELECT 'PAT', '%[^A-Za-z]III[^A-Za-z]%', 'Roman numeral III (numeric representation)'
+	-- Roman numerals as numeric representations (ISMP refined, excluding I)
+	SELECT 'PAT', '%[ ]ii[ ][^.]%',  'Roman numeral ii (numeric representation)' UNION ALL
+	SELECT 'PAT', '%[ ]II[ ][^.]%',  'Roman numeral II (numeric representation)' UNION ALL
+	SELECT 'PAT', '%[ ]iii[ ][^.]%', 'Roman numeral iii (numeric representation)' UNION ALL
+	SELECT 'PAT', '%[ ]III[ ][^.]%', 'Roman numeral III (numeric representation)'
 ),
 
 CombinedDoseInstructions AS (
@@ -18,7 +16,7 @@ CombinedDoseInstructions AS (
     GROUP BY URN, SYSSystemID
 )
 
-SELECT TOP 100
+SELECT TOP 1000
     pat.UnitNumber AS Account,
     pat.AcctNumber AS MRN,
     site.Mnemonic AS Site,
@@ -47,6 +45,8 @@ CROSS APPLY (
     SELECT STRING_AGG(f.Meaning, ', ') AS Flagged
     FROM Forbidden f
     WHERE PATINDEX(f.Pattern, dose.FullDoseInstruction) > 0
+      AND dose.FullDoseInstruction NOT LIKE '%Level II%'
+      AND dose.FullDoseInstruction NOT LIKE '%Level III%'
 ) flags
 
 WHERE rx.Sig <> '.STK-MED'
