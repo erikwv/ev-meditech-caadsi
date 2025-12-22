@@ -141,76 +141,92 @@ SELECT TOP 100
     label.FullLabelComment   AS [Label Comment],
     dose.FullDoseInstruction AS [Dose Instructions],
 
-    flags.Flagged AS [Flagged Abbreviation],
-    flags.FlaggedInDose AS [Flagged in Dose],
-    flags.FlaggedInLabel AS [Flagged in Label]
+    flags.Flagged,
+    flags.FlaggedInDose,
+    flags.FlaggedInLabel
 
 FROM FHA_ANALYTICS.FHA.F_MeditechPHARxMain rx
-
 JOIN FHA_ANALYTICS.FHA.F_MeditechADMPatMain pat
   ON rx.Patient COLLATE DATABASE_DEFAULT = pat.Urn COLLATE DATABASE_DEFAULT
-
 JOIN FHA_ANALYTICS.FHA.F_MeditechADMPatCanadaRecall recall
   ON recall.Urn COLLATE DATABASE_DEFAULT = pat.Urn COLLATE DATABASE_DEFAULT
-
 JOIN FHA_ANALYTICS.FHA.F_MeditechPHARxInpatientMedications med
   ON med.Urn COLLATE DATABASE_DEFAULT = rx.Urn COLLATE DATABASE_DEFAULT
-
 JOIN FHA_ANALYTICS.FHA.D_MeditechPHADrugMain drug_main
   ON drug_main.Mnemonic COLLATE DATABASE_DEFAULT = med.Med COLLATE DATABASE_DEFAULT
-
 JOIN FHA_ANALYTICS.FHA.D_MeditechPHADrugMain5 drug_main5
   ON drug_main5.Mnemonic COLLATE DATABASE_DEFAULT = med.Med COLLATE DATABASE_DEFAULT
-
 LEFT JOIN FHA_ANALYTICS.FHA.F_MeditechPHARxRangeDoses rd
   ON rd.Urn COLLATE DATABASE_DEFAULT = rx.Urn COLLATE DATABASE_DEFAULT
  AND rd.SYSSystemID COLLATE DATABASE_DEFAULT = rx.SYSSystemID COLLATE DATABASE_DEFAULT
-
 JOIN FHA_ANALYTICS.FHA.D_MeditechMISLocnMain loc
   ON loc.Mnemonic COLLATE DATABASE_DEFAULT = pat.Location COLLATE DATABASE_DEFAULT
-
 JOIN FHA_ANALYTICS.FHA.D_MeditechPHASiteDictionary site
   ON site.Mnemonic COLLATE DATABASE_DEFAULT = loc.OeSite COLLATE DATABASE_DEFAULT
-
 LEFT JOIN CombinedLabelComments label
   ON label.URN COLLATE DATABASE_DEFAULT = rx.Urn COLLATE DATABASE_DEFAULT
  AND label.SYSSystemID COLLATE DATABASE_DEFAULT = rx.SYSSystemID COLLATE DATABASE_DEFAULT
-
 LEFT JOIN CombinedDoseInstructions dose
   ON dose.URN COLLATE DATABASE_DEFAULT = rx.Urn COLLATE DATABASE_DEFAULT
  AND dose.SYSSystemID COLLATE DATABASE_DEFAULT = rx.SYSSystemID COLLATE DATABASE_DEFAULT
 
 CROSS APPLY (
-    SELECT 
-        STRING_AGG(Meaning, ', ') AS Flagged,
-        STRING_AGG(CASE WHEN InDose = 1 THEN Meaning END, ', ') AS FlaggedInDose,
-        STRING_AGG(CASE WHEN InLabel = 1 THEN Meaning END, ', ') AS FlaggedInLabel
-    FROM (
-        SELECT DISTINCT
-            f.Meaning,
-            MAX(CASE WHEN (f.MatchType = 'CHAR' AND CHARINDEX(f.Pattern, dose.FullDoseInstruction) > 0) OR
-                          (f.MatchType = 'PAT' AND PATINDEX(f.Pattern, dose.FullDoseInstruction) > 0)
-                     THEN 1 ELSE 0 END) AS InDose,
-            MAX(CASE WHEN (f.MatchType = 'CHAR' AND CHARINDEX(f.Pattern, label.FullLabelComment) > 0) OR
-                          (f.MatchType = 'PAT' AND PATINDEX(f.Pattern, label.FullLabelComment) > 0)
-                     THEN 1 ELSE 0 END) AS InLabel
-        FROM Forbidden f
-        WHERE
-            (f.MatchType = 'CHAR' AND 
-             (CHARINDEX(f.Pattern, dose.FullDoseInstruction) > 0 OR 
-              CHARINDEX(f.Pattern, label.FullLabelComment) > 0))
-            OR
-            (f.MatchType = 'PAT' AND 
-             (PATINDEX(f.Pattern, dose.FullDoseInstruction) > 0 OR 
-              PATINDEX(f.Pattern, label.FullLabelComment) > 0))
-        GROUP BY f.Meaning
-    ) matches
+    SELECT
+        -- Any match (dose OR label)
+        (
+            SELECT STRING_AGG(m.Meaning, ', ')
+            FROM (
+                SELECT DISTINCT f.Meaning
+                FROM Forbidden f
+                WHERE
+                    (f.MatchType = 'CHAR' AND
+                        (CHARINDEX(f.Pattern, ISNULL(dose.FullDoseInstruction, '')) > 0
+                         OR CHARINDEX(f.Pattern, ISNULL(label.FullLabelComment, '')) > 0))
+                    OR
+                    (f.MatchType = 'PAT' AND
+                        (PATINDEX(f.Pattern, ISNULL(dose.FullDoseInstruction, '')) > 0
+                         OR PATINDEX(f.Pattern, ISNULL(label.FullLabelComment, '')) > 0))
+            ) m
+        ) AS Flagged,
+
+        -- Dose only
+        (
+            SELECT STRING_AGG(m.Meaning, ', ')
+            FROM (
+                SELECT DISTINCT f.Meaning
+                FROM Forbidden f
+                WHERE
+                    (f.MatchType = 'CHAR' AND
+                         CHARINDEX(f.Pattern, ISNULL(dose.FullDoseInstruction, '')) > 0)
+                    OR
+                    (f.MatchType = 'PAT' AND
+                         PATINDEX(f.Pattern, ISNULL(dose.FullDoseInstruction, '')) > 0)
+            ) m
+        ) AS FlaggedInDose,
+
+        -- Label only
+        (
+            SELECT STRING_AGG(m.Meaning, ', ')
+            FROM (
+                SELECT DISTINCT f.Meaning
+                FROM Forbidden f
+                WHERE
+                    (f.MatchType = 'CHAR' AND
+                         CHARINDEX(f.Pattern, ISNULL(label.FullLabelComment, '')) > 0)
+                    OR
+                    (f.MatchType = 'PAT' AND
+                         PATINDEX(f.Pattern, ISNULL(label.FullLabelComment, '')) > 0)
+            ) m
+        ) AS FlaggedInLabel
 ) flags
 
 WHERE rx.Sig <> '.STK-MED'
   AND rx.EnterDate >= @StartDate
   AND rx.EnterDate <  @EndDate
   AND flags.Flagged IS NOT NULL
-  AND dose.FullDoseInstruction NOT LIKE '%Antithrombin III%'
-  AND dose.FullDoseInstruction NOT LIKE '%Level II%'
-  AND dose.FullDoseInstruction NOT LIKE '%Level III%';
+  AND ISNULL(dose.FullDoseInstruction, '') NOT LIKE '%Antithrombin III%'
+  AND ISNULL(label.FullLabelComment, '')    NOT LIKE '%Antithrombin III%'
+  AND ISNULL(dose.FullDoseInstruction, '') NOT LIKE '%Level II%'
+  AND ISNULL(label.FullLabelComment, '')    NOT LIKE '%Level II%'
+  AND ISNULL(dose.FullDoseInstruction, '') NOT LIKE '%Level III%'
+  AND ISNULL(label.FullLabelComment, '')    NOT LIKE '%Level III%';
