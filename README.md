@@ -8,15 +8,16 @@ This repository contains SQL queries and documentation for extracting and analyz
 
 ## Project Structure
 
-### Core Query Files
-- **FHA.unapproved_abbrev.sql** - Primary ISMP safety monitoring query (89-94% coverage, de-identified output)
-- **FHA.patient-order-medication-caadsi.sql** - Full CAADSI medication order query with patient identifiers (72% ISMP coverage)
-- **FHA.unap_abbrev-roman_num.sql** - Isolated Roman numeral testing query
-- **FHA.unap_abbrev-dot_eye_day_week.sql** - Edge-case ISMP items testing query
+### Production Query
+- **FHA.unapproved_abbrev.sql** - Production-ready ISMP Canada Do Not Use abbreviation detection query
+  - 83-89% ISMP coverage (15-16 of 18 items)
+  - Scans both dose instructions and label comments
+  - Token-aware pattern matching to minimize false positives
+  - SQL Server 2017-2019 compatible
 
 ### Directories
-- **HDPBC Queries/** - High-Dose Parenteral B12 (HDPBC) related queries
-  - Patient, practitioner, medication, order, and ingredient queries
+- **Archive/** - Historical alternate query versions (reference only)
+- **HDPBC Queries/** - High-Dose Parenteral B12 related queries
 - **ISMP-CDN Docs/** - ISMP Canada Do Not Use List documentation (PDF)
 - **JIRA Files/** - JIRA ticket references and sample queries
 - **Test Results/** - Test data and transaction samples (CSV)
@@ -24,41 +25,42 @@ This repository contains SQL queries and documentation for extracting and analyz
 - **FHA_ANALYTICS db info/** - Database connection information
 
 ### Documentation
-- **ANALYSIS_UNAPPROVED_ABBREVIATIONS.md** - Comprehensive analysis of the unapproved abbreviations query
+- **ANALYSIS_UNAPPROVED_ABBREVIATIONS.md** - Comprehensive query analysis and coverage details
+- **MULTIPLE_DETECTION.md** - Multiple abbreviation detection capabilities documentation
 - **ISMPCanadaDoNotUseList-2025.csv** - CSV version of ISMP Canada Do Not Use List
 - **meditech_segment_sql_tables.txt** - Meditech segment to SQL table mapping
 - **PHA.RX Segment and Field Definitions.txt** - Meditech PHA.RX data model documentation
 
 ## Key Features
 
-### Unapproved Abbreviations Detection
-Two complementary queries identify medication orders containing dangerous abbreviations:
+### Production Query: FHA.unapproved_abbrev.sql
 
-**Primary Safety Query** (`FHA.unapproved_abbrev.sql`):
-- De-identified output (Account/MRN/Location commented out)
-- Parameterized date range for flexible reporting
-- Near-complete ISMP coverage (89-94%)
+Comprehensive medication safety monitoring query that detects ISMP Canada 2025 Do Not Use abbreviations in medication orders.
 
-**Full Clinical Query** (`FHA.patient-order-medication-caadsi.sql`):
-- Includes patient identifiers for clinical follow-up
-- Extended ISMP coverage (72%)
-- Suitable for direct patient care intervention
+**Detection Capabilities**:
+- Scans both dose instructions AND label comments
+- Multiple abbreviations detected per order
+- Source location tracking (dose vs label)
+- Parameterized date range (@StartDate, @EndDate)
 
-**Currently Detected (16-17 of 18 ISMP items)**:
-- Unit abbreviations: U, IU, ug/µg, cc
+**Currently Detected (15-16 of 18 ISMP items)**:
+- Unit abbreviations: U, IU, µg (microgram symbol), cc
 - Frequency abbreviations: OD, QD, QOD, EOD
-- Ear/Eye route abbreviations: AS, AD, AU, OS, OD, OU (numeric context)
+- Route abbreviations: AS, AD, AU (ears), OS, OD, OU (eyes) - numeric context only
 - Symbols: <, >, ≥, ≤, @
-- Clinical abbreviation: D/C
+- Clinical abbreviation: D/C (token-aware with word boundaries)
 - Numeric safety: Trailing zeros (X.0), Missing leading zeros (.X)
 - Ambiguous drug names: MS, MSO4, MgSO4
-- Roman numerals: II, III (I/IV excluded for safety)
+- Roman numerals: II, III only (I/IV intentionally excluded)
 - Time notation: x/7, y/52
-- Days/Doses: D, d (numeric context)
 - Dot notation: Ṫ, ṪṪ, ṪṪṪ
 
-**Query Coverage**: 89-94% of official ISMP Canada Do Not Use List (2025)
-**Excluded by Design**: Roman numeral I (excessive false positives), Roman numeral IV (valid route)
+**ISMP Coverage**: 83-89% (15-16 of 18 items)
+
+**Intentionally Excluded**:
+- Roman numeral I - Excessive false positives in prose
+- Roman numeral IV - Valid route of administration (intravenous)
+- D, d (days/doses) - Removed due to false positives (MD, PhD, etc.); QD already covered
 
 ### Data Sources
 - **Database**: FHA_ANALYTICS
@@ -89,21 +91,36 @@ Evolved through 25+ commits with refinements:
 - SQL Server access to FHA_ANALYTICS database
 - Appropriate permissions for Meditech tables
 
-### Running Queries
+### Running the Query
 ```sql
--- Primary safety monitoring query (de-identified)
--- Returns up to 100 flagged orders from previous calendar year
+-- Production query - detects ISMP abbreviations in previous calendar year
+-- Returns up to 100 flagged orders
 EXEC FHA.unapproved_abbrev.sql
-
--- Full clinical query with patient identifiers
-EXEC FHA.patient-order-medication-caadsi.sql
 ```
 
-### Output Columns
-- Patient info: Account, MRN, Site, Location
-- Order info: Order Number, Entered Date, Provider, Start/Stop dates
-- Medication info: Drug name, dose, route, frequency, instructions
-- Detection: Flagged Abbreviation (comma-separated list)
+### Output Columns (20 total)
+
+**Site/System**:
+- Site, System
+
+**Order Details**:
+- Order Number, Order Entered, Order Type, StartDate, StopDate, Provider
+
+**Medication Details**:
+- Drug Mnemonic, Generic Name, DIN
+- Dose, RangeDoseLow, RangeDoseHigh, Schedule
+- Dose Unit, Dosage Form, Route, Frequency
+
+**Free-text Fields**:
+- Label Comment (multi-line pharmacist comments)
+- Dose Instructions (multi-line dosing instructions)
+
+**Detection Results**:
+- Flagged - All detected abbreviations (comma-separated)
+- FlaggedInDose - Abbreviations found in dose instructions only
+- FlaggedInLabel - Abbreviations found in label comments only
+
+**Note**: Patient identifiers (Account, MRN, Location) are commented out for privacy-focused safety monitoring
 
 ## Regulatory Compliance
 
@@ -111,14 +128,25 @@ EXEC FHA.patient-order-medication-caadsi.sql
 - **URL**: [ismpcanada.ca/do-not-use-list](https://ismpcanada.ca/do-not-use-list)
 - **Local Copy**: `ISMP-CDN Docs/ISMPCanadaDoNotUseList-2025-8X11.pdf`
 
+## Version History
+
+**Current**: Production-ready query with 83-89% ISMP coverage
+- Token-aware D/C detection (word boundaries)
+- Dual-field scanning (dose instructions + label comments)
+- Source location tracking
+- SQL Server 2017-2019 compatible
+- Comprehensive false positive prevention
+
+**Archive**: Historical alternate versions preserved in `Archive/` directory
+
 ## Future Enhancements
 
 See `ANALYSIS_UNAPPROVED_ABBREVIATIONS.md` for detailed recommendations:
-- Expand scanning to label comments
-- Detect trailing/leading zeros
-- Add Roman numeral detection
-- Implement real-time validation
-- Provider feedback reporting
+- Real-time validation at order entry
+- Provider-specific feedback reporting
+- Trend analysis dashboards
+- Integration with CPOE systems
+- Machine learning for context-aware detection
 
 ## License
 
