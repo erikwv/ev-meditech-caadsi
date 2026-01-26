@@ -411,8 +411,13 @@ if len(df_mc_pct) > 0:
     # Add percentage labels at the end
     for i, (idx, row) in enumerate(df_mc_pct.iterrows()):
         pct = row['Pct_of_Orders']
-        ax1.text(pct + 1, i, f'{pct:.1f}%', ha='left', va='center',
+        # Position label slightly to the right of the bar (relative positioning)
+        ax1.text(pct * 1.05, i, f'{pct:.2f}%', ha='left', va='center',
                 fontweight='bold', fontsize=9)
+    
+    # Set reasonable x-axis limits based on data
+    max_pct = df_mc_pct['Pct_of_Orders'].max()
+    ax1.set_xlim(0, max_pct * 1.15)  # 15% padding for labels
     
     plt.tight_layout()
     plt.savefig('Test Results/unapproved_abbreviations_mc_system_pct.png', dpi=300, bbox_inches='tight')
@@ -582,8 +587,13 @@ if len(df_cs_pct) > 0:
     # Add percentage labels at the end
     for i, (idx, row) in enumerate(df_cs_pct.iterrows()):
         pct = row['Pct_of_Orders']
-        ax1.text(pct + 1, i, f'{pct:.1f}%', ha='left', va='center',
+        # Position label slightly to the right of the bar (relative positioning)
+        ax1.text(pct * 1.05, i, f'{pct:.2f}%', ha='left', va='center',
                 fontweight='bold', fontsize=9)
+    
+    # Set reasonable x-axis limits based on data
+    max_pct = df_cs_pct['Pct_of_Orders'].max()
+    ax1.set_xlim(0, max_pct * 1.15)  # 15% padding for labels
     
     plt.tight_layout()
     plt.savefig('Test Results/unapproved_abbreviations_cs_system_pct.png', dpi=300, bbox_inches='tight')
@@ -638,8 +648,13 @@ if len(all_mc_sites) > 0:
             # Add percentage labels
             for i, (idx_row, row) in enumerate(site_df.iterrows()):
                 pct = row['Pct']
-                ax.text(pct + 0.5, i, f'{pct:.1f}%', ha='left', va='center',
+                ax.text(pct * 1.05, i, f'{pct:.2f}%', ha='left', va='center',
                        fontweight='bold', fontsize=8)
+            
+            # Set reasonable x-axis limits
+            if len(site_df) > 0:
+                max_pct = site_df['Pct'].max()
+                ax.set_xlim(0, max_pct * 1.15)
     
     plt.tight_layout()
     plt.savefig('Test Results/unapproved_abbreviations_mc_sites_top5_pct_total.png', dpi=300, bbox_inches='tight')
@@ -694,8 +709,13 @@ if len(all_cs_sites) > 0:
             # Add percentage labels
             for i, (idx_row, row) in enumerate(site_df.iterrows()):
                 pct = row['Pct']
-                ax.text(pct + 0.5, i, f'{pct:.1f}%', ha='left', va='center',
+                ax.text(pct * 1.05, i, f'{pct:.2f}%', ha='left', va='center',
                        fontweight='bold', fontsize=7)
+            
+            # Set reasonable x-axis limits
+            if len(site_df) > 0:
+                max_pct = site_df['Pct'].max()
+                ax.set_xlim(0, max_pct * 1.15)
     
     plt.tight_layout()
     plt.savefig('Test Results/unapproved_abbreviations_cs_sites_top5_pct_total.png', dpi=300, bbox_inches='tight')
@@ -750,8 +770,13 @@ if len(all_mc_sites) > 0:
             # Add percentage labels
             for i, (idx_row, row) in enumerate(site_df.iterrows()):
                 pct = row['Pct']
-                ax.text(pct + 0.5, i, f'{pct:.1f}%', ha='left', va='center',
+                ax.text(pct * 1.05, i, f'{pct:.2f}%', ha='left', va='center',
                        fontweight='bold', fontsize=9)
+            
+            # Set reasonable x-axis limits
+            if len(site_df) > 0:
+                max_pct = site_df['Pct'].max()
+                ax.set_xlim(0, max_pct * 1.15)
     
     plt.tight_layout()
     plt.savefig('Test Results/unapproved_abbreviations_mc_sites_top3_pct_total.png', dpi=300, bbox_inches='tight')
@@ -806,8 +831,13 @@ if len(all_cs_sites) > 0:
             # Add percentage labels
             for i, (idx_row, row) in enumerate(site_df.iterrows()):
                 pct = row['Pct']
-                ax.text(pct + 0.5, i, f'{pct:.1f}%', ha='left', va='center',
+                ax.text(pct * 1.05, i, f'{pct:.2f}%', ha='left', va='center',
                        fontweight='bold', fontsize=8)
+            
+            # Set reasonable x-axis limits
+            if len(site_df) > 0:
+                max_pct = site_df['Pct'].max()
+                ax.set_xlim(0, max_pct * 1.15)
     
     plt.tight_layout()
     plt.savefig('Test Results/unapproved_abbreviations_cs_sites_top3_pct_total.png', dpi=300, bbox_inches='tight')
