@@ -252,13 +252,13 @@ plt.close()
 # FIGURE 2: MC (EX) System Analysis
 # ============================================================================
 if len(df_mc) > 0:
-    # Get all MC sites sorted by volume (exclude low-volume sites)
+    # Get all MC sites sorted by volume (exclude sites with <10,000 total orders)
     mc_site_totals = {site: sum(counters['dose'].values()) + sum(counters['label'].values()) 
                       for site, counters in mc_sites.items()}
-    # Filter out sites with too little data
-    excluded_sites = {'FLW', 'CHE', 'CAC', 'MSA', 'QPH'}
+    # Filter out sites with less than 10,000 total orders
+    MIN_ORDERS = 10000
     mc_site_totals_filtered = {site: total for site, total in mc_site_totals.items() 
-                               if site not in excluded_sites}
+                               if site_counts.get((site, 'EX'), 0) >= MIN_ORDERS}
     all_mc_sites = sorted(mc_site_totals_filtered.items(), key=lambda x: x[1], reverse=True)
     
     # Calculate grid layout (1 chart for system + 1 per site)
@@ -428,13 +428,13 @@ if len(df_mc_pct) > 0:
 # FIGURE 3: CS System Analysis
 # ============================================================================
 if len(df_cs) > 0:
-    # Get all CS sites sorted by volume (exclude low-volume sites)
+    # Get all CS sites sorted by volume (exclude sites with <10,000 total orders)
     cs_site_totals = {site: sum(counters['dose'].values()) + sum(counters['label'].values()) 
                       for site, counters in cs_sites.items()}
-    # Filter out sites with too little data
-    excluded_sites = {'FLW', 'CHE', 'CAC', 'MSA', 'QPH'}
+    # Filter out sites with less than 10,000 total orders
+    MIN_ORDERS = 10000
     cs_site_totals_filtered = {site: total for site, total in cs_site_totals.items() 
-                               if site not in excluded_sites}
+                               if site_counts.get((site, 'CS'), 0) >= MIN_ORDERS}
     all_cs_sites = sorted(cs_site_totals_filtered.items(), key=lambda x: x[1], reverse=True)
     
     # Calculate grid layout (1 chart for system + 1 per site)
