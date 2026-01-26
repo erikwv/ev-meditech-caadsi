@@ -28,11 +28,11 @@ WITH Forbidden (MatchType, Pattern, Meaning) AS (
     SELECT 'PAT', '%[0-9]CC/%',  'cc (Cubic Centimeter)' UNION ALL
     SELECT 'PAT', '%[0-9] CC/%', 'cc (Cubic Centimeter)' UNION ALL
 
-    -- Comparison symbols
+    -- Comparison symbols (< and > combined into single category)
     SELECT 'CHAR', NCHAR(8805), '≥ (Greater Than or Equal)' UNION ALL
     SELECT 'CHAR', NCHAR(8804), '≤ (Less Than or Equal)' UNION ALL
-    SELECT 'CHAR', '>', '> (Greater Than)' UNION ALL
-    SELECT 'CHAR', '<', '< (Less Than)' UNION ALL
+    SELECT 'CHAR', '>', '< or > (Comparison Symbol)' UNION ALL
+    SELECT 'CHAR', '<', '< or > (Comparison Symbol)' UNION ALL
 
     -- Symbol
     SELECT 'CHAR', '@', '@ (At Symbol)' UNION ALL
