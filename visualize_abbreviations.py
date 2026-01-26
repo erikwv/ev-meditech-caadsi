@@ -563,6 +563,226 @@ if len(df_cs_pct) > 0:
     print("Figure 3B saved: Test Results/unapproved_abbreviations_cs_system_pct.png")
     plt.close()
 
+# ============================================================================
+# FIGURE 4: MC Sites - Top 5 Per Site (% of TOTAL Site Orders)
+# ============================================================================
+if len(all_mc_sites) > 0:
+    num_sites = len(all_mc_sites)
+    num_cols = 2
+    num_rows = math.ceil(num_sites / num_cols)
+    
+    fig4 = plt.figure(figsize=(16, num_rows * 5))
+    
+    for idx, (site, site_instance_count) in enumerate(all_mc_sites, start=1):
+        ax = plt.subplot(num_rows, num_cols, idx)
+        
+        # Get top 5 abbreviations for this site
+        site_data = []
+        all_abbrevs = set(list(mc_sites[site]['dose'].keys()) + list(mc_sites[site]['label'].keys()))
+        for abbrev in all_abbrevs:
+            dose_count = mc_sites[site]['dose'].get(abbrev, 0)
+            label_count = mc_sites[site]['label'].get(abbrev, 0)
+            total_instances = dose_count + label_count
+            site_data.append({
+                'Category': abbrev,
+                'Total': total_instances
+            })
+        
+        site_df = pd.DataFrame(site_data).sort_values('Total', ascending=False).head(5)
+        
+        if len(site_df) > 0:
+            # Calculate percentage of TOTAL site orders (including clean orders)
+            site_total_orders = len(mc_sites[site]['orders'])
+            site_df['Pct'] = (site_df['Total'] / site_total_orders * 100)
+            
+            x_pos = range(len(site_df))
+            width = 0.6
+            bars = ax.barh(x_pos, site_df['Pct'], width, color='#e74c3c')
+            
+            ax.set_yticks(x_pos)
+            ax.set_yticklabels(site_df['Category'], fontsize=9)
+            ax.invert_yaxis()
+            ax.set_xlabel('% of Total Site Orders', fontsize=10, fontweight='bold')
+            ax.set_title(f'MC Site: {site}\n(Top 5 as % of {site_total_orders:,} Total Orders)', 
+                        fontsize=11, fontweight='bold', pad=10)
+            ax.grid(axis='x', alpha=0.3)
+            
+            # Add percentage labels
+            for i, (idx_row, row) in enumerate(site_df.iterrows()):
+                pct = row['Pct']
+                ax.text(pct + 0.5, i, f'{pct:.1f}%', ha='left', va='center',
+                       fontweight='bold', fontsize=8)
+    
+    plt.tight_layout()
+    plt.savefig('Test Results/unapproved_abbreviations_mc_sites_top5_pct_total.png', dpi=300, bbox_inches='tight')
+    print("Figure 4 saved: Test Results/unapproved_abbreviations_mc_sites_top5_pct_total.png")
+    plt.close()
+
+# ============================================================================
+# FIGURE 5: CS Sites - Top 5 Per Site (% of TOTAL Site Orders)
+# ============================================================================
+if len(all_cs_sites) > 0:
+    num_sites = len(all_cs_sites)
+    num_cols = 3
+    num_rows = math.ceil(num_sites / num_cols)
+    
+    fig5 = plt.figure(figsize=(18, num_rows * 5))
+    
+    for idx, (site, site_instance_count) in enumerate(all_cs_sites, start=1):
+        ax = plt.subplot(num_rows, num_cols, idx)
+        
+        # Get top 5 abbreviations for this site
+        site_data = []
+        all_abbrevs = set(list(cs_sites[site]['dose'].keys()) + list(cs_sites[site]['label'].keys()))
+        for abbrev in all_abbrevs:
+            dose_count = cs_sites[site]['dose'].get(abbrev, 0)
+            label_count = cs_sites[site]['label'].get(abbrev, 0)
+            total_instances = dose_count + label_count
+            site_data.append({
+                'Category': abbrev,
+                'Total': total_instances
+            })
+        
+        site_df = pd.DataFrame(site_data).sort_values('Total', ascending=False).head(5)
+        
+        if len(site_df) > 0:
+            # Calculate percentage of TOTAL site orders (including clean orders)
+            site_total_orders = len(cs_sites[site]['orders'])
+            site_df['Pct'] = (site_df['Total'] / site_total_orders * 100)
+            
+            x_pos = range(len(site_df))
+            width = 0.6
+            bars = ax.barh(x_pos, site_df['Pct'], width, color='#3498db')
+            
+            ax.set_yticks(x_pos)
+            ax.set_yticklabels(site_df['Category'], fontsize=8)
+            ax.invert_yaxis()
+            ax.set_xlabel('% of Total Site Orders', fontsize=9, fontweight='bold')
+            ax.set_title(f'CS Site: {site}\n(Top 5 as % of {site_total_orders:,} Total Orders)', 
+                        fontsize=10, fontweight='bold', pad=10)
+            ax.grid(axis='x', alpha=0.3)
+            
+            # Add percentage labels
+            for i, (idx_row, row) in enumerate(site_df.iterrows()):
+                pct = row['Pct']
+                ax.text(pct + 0.5, i, f'{pct:.1f}%', ha='left', va='center',
+                       fontweight='bold', fontsize=7)
+    
+    plt.tight_layout()
+    plt.savefig('Test Results/unapproved_abbreviations_cs_sites_top5_pct_total.png', dpi=300, bbox_inches='tight')
+    print("Figure 5 saved: Test Results/unapproved_abbreviations_cs_sites_top5_pct_total.png")
+    plt.close()
+
+# ============================================================================
+# FIGURE 6: MC Sites - Top 3 Per Site (% of TOTAL Site Orders)
+# ============================================================================
+if len(all_mc_sites) > 0:
+    num_sites = len(all_mc_sites)
+    num_cols = 2
+    num_rows = math.ceil(num_sites / num_cols)
+    
+    fig6 = plt.figure(figsize=(16, num_rows * 4))
+    
+    for idx, (site, site_instance_count) in enumerate(all_mc_sites, start=1):
+        ax = plt.subplot(num_rows, num_cols, idx)
+        
+        # Get top 3 abbreviations for this site
+        site_data = []
+        all_abbrevs = set(list(mc_sites[site]['dose'].keys()) + list(mc_sites[site]['label'].keys()))
+        for abbrev in all_abbrevs:
+            dose_count = mc_sites[site]['dose'].get(abbrev, 0)
+            label_count = mc_sites[site]['label'].get(abbrev, 0)
+            total_instances = dose_count + label_count
+            site_data.append({
+                'Category': abbrev,
+                'Total': total_instances
+            })
+        
+        site_df = pd.DataFrame(site_data).sort_values('Total', ascending=False).head(3)
+        
+        if len(site_df) > 0:
+            # Calculate percentage of TOTAL site orders (including clean orders)
+            site_total_orders = len(mc_sites[site]['orders'])
+            site_df['Pct'] = (site_df['Total'] / site_total_orders * 100)
+            
+            x_pos = range(len(site_df))
+            width = 0.6
+            bars = ax.barh(x_pos, site_df['Pct'], width, color='#e74c3c')
+            
+            ax.set_yticks(x_pos)
+            ax.set_yticklabels(site_df['Category'], fontsize=10)
+            ax.invert_yaxis()
+            ax.set_xlabel('% of Total Site Orders', fontsize=10, fontweight='bold')
+            ax.set_title(f'MC Site: {site}\n(Top 3 as % of {site_total_orders:,} Total Orders)', 
+                        fontsize=11, fontweight='bold', pad=10)
+            ax.grid(axis='x', alpha=0.3)
+            
+            # Add percentage labels
+            for i, (idx_row, row) in enumerate(site_df.iterrows()):
+                pct = row['Pct']
+                ax.text(pct + 0.5, i, f'{pct:.1f}%', ha='left', va='center',
+                       fontweight='bold', fontsize=9)
+    
+    plt.tight_layout()
+    plt.savefig('Test Results/unapproved_abbreviations_mc_sites_top3_pct_total.png', dpi=300, bbox_inches='tight')
+    print("Figure 6 saved: Test Results/unapproved_abbreviations_mc_sites_top3_pct_total.png")
+    plt.close()
+
+# ============================================================================
+# FIGURE 7: CS Sites - Top 3 Per Site (% of TOTAL Site Orders)
+# ============================================================================
+if len(all_cs_sites) > 0:
+    num_sites = len(all_cs_sites)
+    num_cols = 3
+    num_rows = math.ceil(num_sites / num_cols)
+    
+    fig7 = plt.figure(figsize=(18, num_rows * 4))
+    
+    for idx, (site, site_instance_count) in enumerate(all_cs_sites, start=1):
+        ax = plt.subplot(num_rows, num_cols, idx)
+        
+        # Get top 3 abbreviations for this site
+        site_data = []
+        all_abbrevs = set(list(cs_sites[site]['dose'].keys()) + list(cs_sites[site]['label'].keys()))
+        for abbrev in all_abbrevs:
+            dose_count = cs_sites[site]['dose'].get(abbrev, 0)
+            label_count = cs_sites[site]['label'].get(abbrev, 0)
+            total_instances = dose_count + label_count
+            site_data.append({
+                'Category': abbrev,
+                'Total': total_instances
+            })
+        
+        site_df = pd.DataFrame(site_data).sort_values('Total', ascending=False).head(3)
+        
+        if len(site_df) > 0:
+            # Calculate percentage of TOTAL site orders (including clean orders)
+            site_total_orders = len(cs_sites[site]['orders'])
+            site_df['Pct'] = (site_df['Total'] / site_total_orders * 100)
+            
+            x_pos = range(len(site_df))
+            width = 0.6
+            bars = ax.barh(x_pos, site_df['Pct'], width, color='#3498db')
+            
+            ax.set_yticks(x_pos)
+            ax.set_yticklabels(site_df['Category'], fontsize=9)
+            ax.invert_yaxis()
+            ax.set_xlabel('% of Total Site Orders', fontsize=9, fontweight='bold')
+            ax.set_title(f'CS Site: {site}\n(Top 3 as % of {site_total_orders:,} Total Orders)', 
+                        fontsize=10, fontweight='bold', pad=10)
+            ax.grid(axis='x', alpha=0.3)
+            
+            # Add percentage labels
+            for i, (idx_row, row) in enumerate(site_df.iterrows()):
+                pct = row['Pct']
+                ax.text(pct + 0.5, i, f'{pct:.1f}%', ha='left', va='center',
+                       fontweight='bold', fontsize=8)
+    
+    plt.tight_layout()
+    plt.savefig('Test Results/unapproved_abbreviations_cs_sites_top3_pct_total.png', dpi=300, bbox_inches='tight')
+    print("Figure 7 saved: Test Results/unapproved_abbreviations_cs_sites_top3_pct_total.png")
+    plt.close()
+
 print("\nAll visualizations completed!")
 
 # Create summary statistics
