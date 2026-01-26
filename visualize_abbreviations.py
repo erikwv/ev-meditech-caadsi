@@ -13,10 +13,20 @@ import math
 sns.set_style("whitegrid")
 plt.rcParams['figure.figsize'] = (14, 10)
 
-# Read the data
+# Read the flagged orders data
 with open('Test Results/unap_abbrev_mt_2025-01-19.csv', 'r', encoding='utf-8-sig') as f:
     reader = csv.DictReader(f)
     data = list(reader)
+
+# Read the ACCURATE total order counts (ALL orders, not just flagged)
+with open('Test Results/total_num_orders_by_system.csv', 'r', encoding='utf-8-sig') as f:
+    reader = csv.DictReader(f)
+    system_counts = {row['System']: int(row['TotalOrders']) for row in reader}
+
+with open('Test Results/total_num_orders_by_site.csv', 'r', encoding='utf-8-sig') as f:
+    reader = csv.DictReader(f)
+    site_counts_list = list(reader)
+    site_counts = {(row['Site'], row['System']): int(row['TotalOrders']) for row in site_counts_list}
 
 # Prepare data for analysis - split by system (EX=MC, CS=CS)
 dose_flagged = []
@@ -80,9 +90,24 @@ for idx, row in enumerate(data):
             label_flagged_cs.extend(meanings)
             cs_sites[site]['label'].update(meanings)
 
-# Calculate order counts
-mc_orders = len(mc_order_ids)
-cs_orders = len(cs_order_ids)
+# Use ACCURATE total order counts from database query results
+# These include ALL orders (clean + flagged), not just the flagged ones we have in data
+mc_orders = system_counts.get('EX', len(mc_order_ids))  # EX = MC system
+cs_orders = system_counts.get('CS', len(cs_order_ids))  # CS system
+
+print(f"\n{'='*70}")
+print(f"ORDER COUNTS (ACCURATE - includes all orders, not just flagged):")
+print(f"{'='*70}")
+print(f"Total MC (EX) orders: {mc_orders:,}")
+print(f"Total CS orders: {cs_orders:,}")
+print(f"Grand total: {mc_orders + cs_orders:,}")
+print(f"\nFlagged orders in dataset: {len(data):,}")
+print(f"Flagged MC orders: {len(mc_order_ids):,}")
+print(f"Flagged CS orders: {len(cs_order_ids):,}")
+print(f"\nOverall flagged rate: {len(data)/(mc_orders+cs_orders)*100:.2f}%")
+print(f"MC flagged rate: {len(mc_order_ids)/mc_orders*100:.2f}%")
+print(f"CS flagged rate: {len(cs_order_ids)/cs_orders*100:.2f}%")
+print(f"{'='*70}\n")
 
 dose_counter = Counter(dose_flagged)
 label_counter = Counter(label_flagged)
@@ -358,7 +383,8 @@ if len(df_mc_pct) > 0:
             site_dose = mc_sites[site]['dose'].get(abbrev, 0)
             site_label = mc_sites[site]['label'].get(abbrev, 0)
             site_total = site_dose + site_label
-            site_order_count = len(mc_sites[site]['orders'])
+            # Use ACCURATE site order count from database
+            site_order_count = site_counts.get((site, 'EX'), len(mc_sites[site]['orders']))
             
             # Calculate percentage of site's orders
             site_pct = (site_total / site_order_count * 100) if site_order_count > 0 else 0
@@ -528,7 +554,8 @@ if len(df_cs_pct) > 0:
             site_dose = cs_sites[site]['dose'].get(abbrev, 0)
             site_label = cs_sites[site]['label'].get(abbrev, 0)
             site_total = site_dose + site_label
-            site_order_count = len(cs_sites[site]['orders'])
+            # Use ACCURATE site order count from database
+            site_order_count = site_counts.get((site, 'CS'), len(cs_sites[site]['orders']))
             
             # Calculate percentage of site's orders
             site_pct = (site_total / site_order_count * 100) if site_order_count > 0 else 0
@@ -592,7 +619,8 @@ if len(all_mc_sites) > 0:
         
         if len(site_df) > 0:
             # Calculate percentage of TOTAL site orders (including clean orders)
-            site_total_orders = len(mc_sites[site]['orders'])
+            # Use ACCURATE count from database, not just flagged orders
+            site_total_orders = site_counts.get((site, 'EX'), len(mc_sites[site]['orders']))
             site_df['Pct'] = (site_df['Total'] / site_total_orders * 100)
             
             x_pos = range(len(site_df))
@@ -647,7 +675,8 @@ if len(all_cs_sites) > 0:
         
         if len(site_df) > 0:
             # Calculate percentage of TOTAL site orders (including clean orders)
-            site_total_orders = len(cs_sites[site]['orders'])
+            # Use ACCURATE count from database, not just flagged orders
+            site_total_orders = site_counts.get((site, 'CS'), len(cs_sites[site]['orders']))
             site_df['Pct'] = (site_df['Total'] / site_total_orders * 100)
             
             x_pos = range(len(site_df))
@@ -702,7 +731,8 @@ if len(all_mc_sites) > 0:
         
         if len(site_df) > 0:
             # Calculate percentage of TOTAL site orders (including clean orders)
-            site_total_orders = len(mc_sites[site]['orders'])
+            # Use ACCURATE count from database, not just flagged orders
+            site_total_orders = site_counts.get((site, 'EX'), len(mc_sites[site]['orders']))
             site_df['Pct'] = (site_df['Total'] / site_total_orders * 100)
             
             x_pos = range(len(site_df))
@@ -757,7 +787,8 @@ if len(all_cs_sites) > 0:
         
         if len(site_df) > 0:
             # Calculate percentage of TOTAL site orders (including clean orders)
-            site_total_orders = len(cs_sites[site]['orders'])
+            # Use ACCURATE count from database, not just flagged orders
+            site_total_orders = site_counts.get((site, 'CS'), len(cs_sites[site]['orders']))
             site_df['Pct'] = (site_df['Total'] / site_total_orders * 100)
             
             x_pos = range(len(site_df))
