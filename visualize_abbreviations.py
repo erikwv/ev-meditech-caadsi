@@ -844,6 +844,118 @@ if len(all_cs_sites) > 0:
     print("Figure 7 saved: Test Results/unapproved_abbreviations_cs_sites_top3_pct_total.png")
     plt.close()
 
+# ============================================================================
+# FIGURE 8: MC Sites - Top 5 Per Site (BY FREQUENCY)
+# ============================================================================
+if len(all_mc_sites) > 0:
+    num_sites = len(all_mc_sites)
+    num_cols = 2
+    num_rows = math.ceil(num_sites / num_cols)
+    
+    fig8 = plt.figure(figsize=(16, num_rows * 5))
+    
+    for idx, (site, site_instance_count) in enumerate(all_mc_sites, start=1):
+        ax = plt.subplot(num_rows, num_cols, idx)
+        
+        # Get top 5 abbreviations for this site
+        site_data = []
+        all_abbrevs = set(list(mc_sites[site]['dose'].keys()) + list(mc_sites[site]['label'].keys()))
+        for abbrev in all_abbrevs:
+            dose_count = mc_sites[site]['dose'].get(abbrev, 0)
+            label_count = mc_sites[site]['label'].get(abbrev, 0)
+            site_data.append({
+                'Category': abbrev,
+                'Dose Instructions': dose_count,
+                'Label Comments': label_count,
+                'Total': dose_count + label_count
+            })
+        
+        site_df = pd.DataFrame(site_data).sort_values('Total', ascending=False).head(5)
+        
+        if len(site_df) > 0:
+            x_pos = range(len(site_df))
+            width = 0.6
+            p1 = ax.barh(x_pos, site_df['Dose Instructions'], width, label='Dose Instructions', color='#e74c3c')
+            p2 = ax.barh(x_pos, site_df['Label Comments'], width, left=site_df['Dose Instructions'], 
+                        label='Label Comments', color='#3498db')
+            
+            ax.set_yticks(x_pos)
+            ax.set_yticklabels(site_df['Category'], fontsize=9)
+            ax.invert_yaxis()
+            ax.set_xlabel('Frequency', fontsize=10, fontweight='bold')
+            site_total_orders = site_counts.get((site, 'EX'), 0)
+            ax.set_title(f'MC Site: {site}\n(Top 5 by Frequency - {site_total_orders:,} Total Orders)', 
+                        fontsize=11, fontweight='bold', pad=10)
+            ax.legend(loc='lower right', fontsize=8)
+            ax.grid(axis='x', alpha=0.3)
+            
+            # Add value labels
+            for i, (idx_row, row) in enumerate(site_df.iterrows()):
+                total = row['Total']
+                ax.text(total * 1.05, i, f'{int(total)}', ha='left', va='center',
+                       fontweight='bold', fontsize=8)
+    
+    plt.tight_layout()
+    plt.savefig('Test Results/unapproved_abbreviations_mc_sites_top5_freq.png', dpi=300, bbox_inches='tight')
+    print("Figure 8 saved: Test Results/unapproved_abbreviations_mc_sites_top5_freq.png")
+    plt.close()
+
+# ============================================================================
+# FIGURE 9: CS Sites - Top 5 Per Site (BY FREQUENCY)
+# ============================================================================
+if len(all_cs_sites) > 0:
+    num_sites = len(all_cs_sites)
+    num_cols = 3
+    num_rows = math.ceil(num_sites / num_cols)
+    
+    fig9 = plt.figure(figsize=(18, num_rows * 5))
+    
+    for idx, (site, site_instance_count) in enumerate(all_cs_sites, start=1):
+        ax = plt.subplot(num_rows, num_cols, idx)
+        
+        # Get top 5 abbreviations for this site
+        site_data = []
+        all_abbrevs = set(list(cs_sites[site]['dose'].keys()) + list(cs_sites[site]['label'].keys()))
+        for abbrev in all_abbrevs:
+            dose_count = cs_sites[site]['dose'].get(abbrev, 0)
+            label_count = cs_sites[site]['label'].get(abbrev, 0)
+            site_data.append({
+                'Category': abbrev,
+                'Dose Instructions': dose_count,
+                'Label Comments': label_count,
+                'Total': dose_count + label_count
+            })
+        
+        site_df = pd.DataFrame(site_data).sort_values('Total', ascending=False).head(5)
+        
+        if len(site_df) > 0:
+            x_pos = range(len(site_df))
+            width = 0.6
+            p1 = ax.barh(x_pos, site_df['Dose Instructions'], width, label='Dose Instructions', color='#e74c3c')
+            p2 = ax.barh(x_pos, site_df['Label Comments'], width, left=site_df['Dose Instructions'], 
+                        label='Label Comments', color='#3498db')
+            
+            ax.set_yticks(x_pos)
+            ax.set_yticklabels(site_df['Category'], fontsize=8)
+            ax.invert_yaxis()
+            ax.set_xlabel('Frequency', fontsize=9, fontweight='bold')
+            site_total_orders = site_counts.get((site, 'CS'), 0)
+            ax.set_title(f'CS Site: {site}\n(Top 5 by Frequency - {site_total_orders:,} Total Orders)', 
+                        fontsize=10, fontweight='bold', pad=10)
+            ax.legend(loc='lower right', fontsize=7)
+            ax.grid(axis='x', alpha=0.3)
+            
+            # Add value labels
+            for i, (idx_row, row) in enumerate(site_df.iterrows()):
+                total = row['Total']
+                ax.text(total * 1.05, i, f'{int(total)}', ha='left', va='center',
+                       fontweight='bold', fontsize=7)
+    
+    plt.tight_layout()
+    plt.savefig('Test Results/unapproved_abbreviations_cs_sites_top5_freq.png', dpi=300, bbox_inches='tight')
+    print("Figure 9 saved: Test Results/unapproved_abbreviations_cs_sites_top5_freq.png")
+    plt.close()
+
 print("\nAll visualizations completed!")
 
 # Create summary statistics
