@@ -280,7 +280,9 @@ if len(df_mc) > 0:
     # Define colors for each site
     site_colors = {'RCH': '#e74c3c', 'ERH': '#3498db', 'MMH': '#2ecc71', 'FCH': '#f39c12',
                    'BH': '#9b59b6', 'SMH': '#1abc9c', 'RMH': '#e67e22', 'ARH': '#95a5a6',
-                   'LMH': '#34495e', 'PAH': '#16a085', 'CGH': '#d35400', 'DH': '#c0392b'}
+                   'LMH': '#34495e', 'PAH': '#16a085', 'CGH': '#d35400', 'DH': '#c0392b',
+                   'CHE': '#8e44ad', 'FLW': '#27ae60', 'CAC': '#f1c40f', 'MSA': '#e84393',
+                   'QPH': '#00b894', 'HV': '#0984e3'}
     
     # Calculate site contributions for each abbreviation
     for i, (idx, row) in enumerate(df_mc.iterrows()):
@@ -426,7 +428,9 @@ if len(df_mc_pct) > 0:
     # Define colors for each site
     site_colors = {'RCH': '#e74c3c', 'ERH': '#3498db', 'MMH': '#2ecc71', 'FCH': '#f39c12',
                    'BH': '#9b59b6', 'SMH': '#1abc9c', 'RMH': '#e67e22', 'ARH': '#95a5a6',
-                   'LMH': '#34495e', 'PAH': '#16a085', 'CGH': '#d35400', 'DH': '#c0392b'}
+                   'LMH': '#34495e', 'PAH': '#16a085', 'CGH': '#d35400', 'DH': '#c0392b',
+                   'CHE': '#8e44ad', 'FLW': '#27ae60', 'CAC': '#f1c40f', 'MSA': '#e84393',
+                   'QPH': '#00b894', 'HV': '#0984e3'}
     
     # Calculate site contributions as percentages
     for i, (idx, row) in enumerate(df_mc_pct.iterrows()):
@@ -497,7 +501,7 @@ if len(df_cs) > 0:
     num_cols = 3
     num_rows = math.ceil(num_cs_charts / num_cols)
     
-    fig3 = plt.figure(figsize=(18, num_rows * 5))
+    fig3 = plt.figure(figsize=(22, num_rows * 5))
     
     # Top 5 CS abbreviations with site breakdown
     ax1 = plt.subplot(num_rows, num_cols, 1)
@@ -507,7 +511,9 @@ if len(df_cs) > 0:
     # Use same color palette for sites
     site_colors = {'RCH': '#e74c3c', 'ERH': '#3498db', 'MMH': '#2ecc71', 'FCH': '#f39c12',
                    'BH': '#9b59b6', 'SMH': '#1abc9c', 'RMH': '#e67e22', 'ARH': '#95a5a6',
-                   'LMH': '#34495e', 'PAH': '#16a085', 'CGH': '#d35400', 'DH': '#c0392b'}
+                   'LMH': '#34495e', 'PAH': '#16a085', 'CGH': '#d35400', 'DH': '#c0392b',
+                   'CHE': '#8e44ad', 'FLW': '#27ae60', 'CAC': '#f1c40f', 'MSA': '#e84393',
+                   'QPH': '#00b894', 'HV': '#0984e3'}
     
     # Calculate site contributions for each abbreviation
     for i, (idx, row) in enumerate(df_cs.iterrows()):
@@ -585,8 +591,8 @@ if len(df_cs) > 0:
                 ax.text(total + 5, i, f'{int(total)}', ha='left', va='center',
                        fontweight='bold', fontsize=7)
     
-    plt.tight_layout()
-    plt.savefig('Test Results/unapproved_abbreviations_cs_system.png', dpi=300, bbox_inches='tight')
+    plt.subplots_adjust(left=0.05, right=0.98, top=0.95, bottom=0.05, hspace=0.4, wspace=0.40)
+    plt.savefig('Test Results/unapproved_abbreviations_cs_system.png', dpi=300)
     print("Figure 3 saved: Test Results/unapproved_abbreviations_cs_system.png")
     plt.close()
     
@@ -653,7 +659,12 @@ if len(df_cs_pct) > 0:
     # Use same color palette for sites
     site_colors = {'RCH': '#e74c3c', 'ERH': '#3498db', 'MMH': '#2ecc71', 'FCH': '#f39c12',
                    'BH': '#9b59b6', 'SMH': '#1abc9c', 'RMH': '#e67e22', 'ARH': '#95a5a6',
-                   'LMH': '#34495e', 'PAH': '#16a085', 'CGH': '#d35400', 'DH': '#c0392b'}
+                   'LMH': '#34495e', 'PAH': '#16a085', 'CGH': '#d35400', 'DH': '#c0392b',
+                   'CHE': '#8e44ad', 'FLW': '#27ae60', 'CAC': '#f1c40f', 'MSA': '#e84393',
+                   'QPH': '#00b894', 'HV': '#0984e3'}
+    
+    # Track cumulative totals for label positioning
+    bar_totals = []
     
     # Calculate site contributions as percentages
     for i, (idx, row) in enumerate(df_cs_pct.iterrows()):
@@ -676,6 +687,9 @@ if len(df_cs_pct) > 0:
                         color=site_colors.get(site, '#95a5a6'), 
                         label=site if i == 0 else '')
                 left += site_pct
+        
+        # Store the total stacked width for this row
+        bar_totals.append(left)
     
     ax1.set_yticks(x_pos)
     ax1.set_yticklabels(df_cs_pct['Category'], fontsize=10)
@@ -687,19 +701,20 @@ if len(df_cs_pct) > 0:
     # Create legend with unique site labels only
     handles, labels = ax1.get_legend_handles_labels()
     by_label = dict(zip(labels, handles))
-    ax1.legend(by_label.values(), by_label.keys(), loc='lower right', fontsize=9)
+    ax1.legend(by_label.values(), by_label.keys(), loc='upper right', fontsize=9)
     ax1.grid(axis='x', alpha=0.3)
     
-    # Add percentage labels at the end
+    # Add percentage labels at the end of each stacked bar
     for i, (idx, row) in enumerate(df_cs_pct.iterrows()):
         pct = row['Pct_of_Orders']
-        # Position label slightly to the right of the bar (relative positioning)
-        ax1.text(pct * 1.05, i, f'{pct:.2f}%', ha='left', va='center',
+        bar_end = bar_totals[i]  # Use the actual stacked total
+        # Position label at the end of the stacked bar
+        ax1.text(bar_end, i, f' {pct:.2f}%', ha='left', va='center',
                 fontweight='bold', fontsize=9)
     
-    # Set reasonable x-axis limits based on data
-    max_pct = df_cs_pct['Pct_of_Orders'].max()
-    ax1.set_xlim(0, max_pct * 1.15)  # 15% padding for labels
+    # Set reasonable x-axis limits based on data - extend for legend and labels
+    max_bar_total = max(bar_totals)
+    ax1.set_xlim(0, max_bar_total * 1.3)  # 30% padding for labels and legend
     
     plt.tight_layout()
     plt.savefig('Test Results/unapproved_abbreviations_cs_system_pct.png', dpi=300, bbox_inches='tight')
