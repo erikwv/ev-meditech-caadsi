@@ -11,7 +11,7 @@ from collections import defaultdict
 input_file = 'Test Results/unap_abbrev_mt_2025-01-19_2025-01-29_update.csv'
 
 # Output directory
-output_dir = 'Test Results/by_site'
+output_dir = 'Test Results/site_ua_data'
 os.makedirs(output_dir, exist_ok=True)
 
 # Read the data and group by site

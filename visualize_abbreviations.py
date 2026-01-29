@@ -15,7 +15,7 @@ sns.set_style("whitegrid")
 plt.rcParams['figure.figsize'] = (14, 10)
 
 # Create directory for individual site charts
-os.makedirs('Test Results/individual_sites', exist_ok=True)
+os.makedirs('Test Results/site_spec_ua_figs', exist_ok=True)
 
 # Read the flagged orders data (updated with corrected AS pattern filtering)
 with open('Test Results/unap_abbrev_mt_2025-01-19_2025-01-29_update.csv', 'r', encoding='utf-8-sig') as f:
@@ -248,8 +248,8 @@ for i, (idx, row) in enumerate(df.iterrows()):
             fontweight='bold', fontsize=10)
 
 plt.tight_layout()
-plt.savefig('Test Results/unapproved_abbreviations_top5.png', dpi=300, bbox_inches='tight')
-print("Figure 1 saved: Test Results/unapproved_abbreviations_top5.png")
+plt.savefig('Test Results/sys_sum_ua_figs/unapproved_abbreviations_top5.png', dpi=300, bbox_inches='tight')
+print("Figure 1 saved: Test Results/sys_sum_ua_figs/unapproved_abbreviations_top5.png")
 plt.close()
 
 # ============================================================================
@@ -361,8 +361,8 @@ if len(df_mc) > 0:
                        fontweight='bold', fontsize=7)
     
     plt.subplots_adjust(left=0.05, right=0.98, top=0.95, bottom=0.05, hspace=0.5, wspace=0.35)
-    plt.savefig('Test Results/unapproved_abbreviations_mc_system.png', dpi=300, bbox_inches='tight')
-    print("Figure 2 saved: Test Results/unapproved_abbreviations_mc_system.png")
+    plt.savefig('Test Results/sys_sum_ua_figs/unapproved_abbreviations_mc_system.png', dpi=300, bbox_inches='tight')
+    print("Figure 2 saved: Test Results/sys_sum_ua_figs/unapproved_abbreviations_mc_system.png")
     plt.close()
     
     # Save individual site charts (frequency-based)
@@ -413,7 +413,7 @@ if len(df_mc) > 0:
                 ax.set_xlim(0, max_total * 1.15)
             
             plt.tight_layout()
-            plt.savefig(f'Test Results/individual_sites/mc_{site}_freq.png', dpi=300, bbox_inches='tight')
+            plt.savefig(f'Test Results/site_spec_ua_figs/mc_{site}_freq.png', dpi=300, bbox_inches='tight')
             plt.close()
 
 # ============================================================================
@@ -479,8 +479,8 @@ if len(df_mc_pct) > 0:
     ax1.set_xlim(0, max_pct * 1.15)  # 15% padding for labels
     
     plt.tight_layout()
-    plt.savefig('Test Results/unapproved_abbreviations_mc_system_pct.png', dpi=300, bbox_inches='tight')
-    print("Figure 2B saved: Test Results/unapproved_abbreviations_mc_system_pct.png")
+    plt.savefig('Test Results/sys_sum_ua_figs/unapproved_abbreviations_mc_system_pct.png', dpi=300, bbox_inches='tight')
+    print("Figure 2B saved: Test Results/sys_sum_ua_figs/unapproved_abbreviations_mc_system_pct.png")
     plt.close()
 
 # ============================================================================
@@ -592,8 +592,8 @@ if len(df_cs) > 0:
                        fontweight='bold', fontsize=7)
     
     plt.subplots_adjust(left=0.05, right=0.98, top=0.95, bottom=0.05, hspace=0.5, wspace=0.40)
-    plt.savefig('Test Results/unapproved_abbreviations_cs_system.png', dpi=300)
-    print("Figure 3 saved: Test Results/unapproved_abbreviations_cs_system.png")
+    plt.savefig('Test Results/sys_sum_ua_figs/unapproved_abbreviations_cs_system.png', dpi=300)
+    print("Figure 3 saved: Test Results/sys_sum_ua_figs/unapproved_abbreviations_cs_system.png")
     plt.close()
     
     # Save individual site charts (frequency-based)
@@ -644,7 +644,7 @@ if len(df_cs) > 0:
                 ax.set_xlim(0, max_total * 1.15)
             
             plt.tight_layout()
-            plt.savefig(f'Test Results/individual_sites/cs_{site}_freq.png', dpi=300, bbox_inches='tight')
+            plt.savefig(f'Test Results/site_spec_ua_figs/cs_{site}_freq.png', dpi=300, bbox_inches='tight')
             plt.close()
 
 # ============================================================================
@@ -717,8 +717,8 @@ if len(df_cs_pct) > 0:
     ax1.set_xlim(0, max_bar_total * 1.3)  # 30% padding for labels and legend
     
     plt.tight_layout()
-    plt.savefig('Test Results/unapproved_abbreviations_cs_system_pct.png', dpi=300, bbox_inches='tight')
-    print("Figure 3B saved: Test Results/unapproved_abbreviations_cs_system_pct.png")
+    plt.savefig('Test Results/sys_sum_ua_figs/unapproved_abbreviations_cs_system_pct.png', dpi=300, bbox_inches='tight')
+    print("Figure 3B saved: Test Results/sys_sum_ua_figs/unapproved_abbreviations_cs_system_pct.png")
     plt.close()
 
 # ============================================================================
@@ -778,8 +778,8 @@ if len(all_mc_sites) > 0:
                 ax.set_xlim(0, max_pct * 1.15)
     
     plt.subplots_adjust(left=0.08, right=0.95, top=0.95, bottom=0.05, hspace=0.5, wspace=0.3)
-    plt.savefig('Test Results/unapproved_abbreviations_mc_sites_top5_pct_total.png', dpi=300, bbox_inches='tight')
-    print("Figure 4 saved: Test Results/unapproved_abbreviations_mc_sites_top5_pct_total.png")
+    plt.savefig('Test Results/sys_sum_ua_figs/unapproved_abbreviations_mc_sites_top5_pct_total.png', dpi=300, bbox_inches='tight')
+    print("Figure 4 saved: Test Results/sys_sum_ua_figs/unapproved_abbreviations_mc_sites_top5_pct_total.png")
     plt.close()
 
 # ============================================================================
@@ -839,8 +839,8 @@ if len(all_cs_sites) > 0:
                 ax.set_xlim(0, max_pct * 1.15)
     
     plt.subplots_adjust(left=0.05, right=0.98, top=0.95, bottom=0.05, hspace=0.5, wspace=0.35)
-    plt.savefig('Test Results/unapproved_abbreviations_cs_sites_top5_pct_total.png', dpi=300, bbox_inches='tight')
-    print("Figure 5 saved: Test Results/unapproved_abbreviations_cs_sites_top5_pct_total.png")
+    plt.savefig('Test Results/sys_sum_ua_figs/unapproved_abbreviations_cs_sites_top5_pct_total.png', dpi=300, bbox_inches='tight')
+    print("Figure 5 saved: Test Results/sys_sum_ua_figs/unapproved_abbreviations_cs_sites_top5_pct_total.png")
     plt.close()
 
 # ============================================================================
@@ -900,8 +900,8 @@ if len(all_mc_sites) > 0:
                 ax.set_xlim(0, max_pct * 1.15)
     
     plt.subplots_adjust(left=0.08, right=0.95, top=0.95, bottom=0.05, hspace=0.5, wspace=0.3)
-    plt.savefig('Test Results/unapproved_abbreviations_mc_sites_top3_pct_total.png', dpi=300, bbox_inches='tight')
-    print("Figure 6 saved: Test Results/unapproved_abbreviations_mc_sites_top3_pct_total.png")
+    plt.savefig('Test Results/sys_sum_ua_figs/unapproved_abbreviations_mc_sites_top3_pct_total.png', dpi=300, bbox_inches='tight')
+    print("Figure 6 saved: Test Results/sys_sum_ua_figs/unapproved_abbreviations_mc_sites_top3_pct_total.png")
     plt.close()
 
 # ============================================================================
@@ -961,8 +961,8 @@ if len(all_cs_sites) > 0:
                 ax.set_xlim(0, max_pct * 1.15)
     
     plt.subplots_adjust(left=0.05, right=0.98, top=0.95, bottom=0.05, hspace=0.5, wspace=0.35)
-    plt.savefig('Test Results/unapproved_abbreviations_cs_sites_top3_pct_total.png', dpi=300, bbox_inches='tight')
-    print("Figure 7 saved: Test Results/unapproved_abbreviations_cs_sites_top3_pct_total.png")
+    plt.savefig('Test Results/sys_sum_ua_figs/unapproved_abbreviations_cs_sites_top3_pct_total.png', dpi=300, bbox_inches='tight')
+    print("Figure 7 saved: Test Results/sys_sum_ua_figs/unapproved_abbreviations_cs_sites_top3_pct_total.png")
     plt.close()
 
 # ============================================================================
@@ -1022,8 +1022,8 @@ if len(all_mc_sites) > 0:
                 ax.set_xlim(0, max_total * 1.15)
     
     plt.subplots_adjust(left=0.08, right=0.95, top=0.95, bottom=0.05, hspace=0.5, wspace=0.3)
-    plt.savefig('Test Results/unapproved_abbreviations_mc_sites_top5_freq.png', dpi=300, bbox_inches='tight')
-    print("Figure 8 saved: Test Results/unapproved_abbreviations_mc_sites_top5_freq.png")
+    plt.savefig('Test Results/sys_sum_ua_figs/unapproved_abbreviations_mc_sites_top5_freq.png', dpi=300, bbox_inches='tight')
+    print("Figure 8 saved: Test Results/sys_sum_ua_figs/unapproved_abbreviations_mc_sites_top5_freq.png")
     plt.close()
 
 # ============================================================================
@@ -1083,8 +1083,8 @@ if len(all_cs_sites) > 0:
                 ax.set_xlim(0, max_total * 1.15)
     
     plt.subplots_adjust(left=0.05, right=0.98, top=0.95, bottom=0.05, hspace=0.5, wspace=0.35)
-    plt.savefig('Test Results/unapproved_abbreviations_cs_sites_top5_freq.png', dpi=300, bbox_inches='tight')
-    print("Figure 9 saved: Test Results/unapproved_abbreviations_cs_sites_top5_freq.png")
+    plt.savefig('Test Results/sys_sum_ua_figs/unapproved_abbreviations_cs_sites_top5_freq.png', dpi=300, bbox_inches='tight')
+    print("Figure 9 saved: Test Results/sys_sum_ua_figs/unapproved_abbreviations_cs_sites_top5_freq.png")
     plt.close()
 
 print("\nAll visualizations completed!")
