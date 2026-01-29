@@ -223,7 +223,7 @@ p2 = ax0_1.barh(x_pos, df['Label Comments'], width, left=df['Dose Instructions']
 ax0_1.set_yticks(x_pos)
 ax0_1.set_yticklabels(df['Category'], fontsize=10)
 ax0_1.invert_yaxis()
-ax0_1.set_xlabel('Frequency', fontsize=11, fontweight='bold')
+ax0_1.set_xlabel('Number of Orders', fontsize=11, fontweight='bold')
 ax0_1.set_title(f'Top 5 Overall\n({len(data):,} Flagged Orders)', 
               fontsize=12, fontweight='bold', pad=10)
 ax0_1.legend(loc='lower right', fontsize=9)
@@ -251,7 +251,7 @@ if len(df_mc) > 0:
     ax0_2.set_yticks(x_pos)
     ax0_2.set_yticklabels(df_mc['Category'], fontsize=10)
     ax0_2.invert_yaxis()
-    ax0_2.set_xlabel('Frequency', fontsize=11, fontweight='bold')
+    ax0_2.set_xlabel('Number of Orders', fontsize=11, fontweight='bold')
     ax0_2.set_title(f'Top 5 MC System\n({len(mc_order_ids):,} Flagged Orders)', 
                   fontsize=12, fontweight='bold', pad=10)
     ax0_2.legend(loc='lower right', fontsize=9)
@@ -279,7 +279,7 @@ if len(df_cs) > 0:
     ax0_3.set_yticks(x_pos)
     ax0_3.set_yticklabels(df_cs['Category'], fontsize=10)
     ax0_3.invert_yaxis()
-    ax0_3.set_xlabel('Frequency', fontsize=11, fontweight='bold')
+    ax0_3.set_xlabel('Number of Orders', fontsize=11, fontweight='bold')
     ax0_3.set_title(f'Top 5 CS System\n({len(cs_order_ids):,} Flagged Orders)', 
                   fontsize=12, fontweight='bold', pad=10)
     ax0_3.legend(loc='lower right', fontsize=9)
@@ -317,7 +317,7 @@ p2 = ax1.barh(x_pos, df['Label Comments'], width, left=df['Dose Instructions'],
 ax1.set_yticks(x_pos)
 ax1.set_yticklabels(df['Category'], fontsize=11)
 ax1.invert_yaxis()
-ax1.set_xlabel('Frequency', fontsize=12, fontweight='bold')
+ax1.set_xlabel('Number of Orders', fontsize=12, fontweight='bold')
 ax1.set_title('Top 5 Unapproved Abbreviations (Overall)\n(Dose Instructions vs Label Comments)', 
               fontsize=14, fontweight='bold', pad=15)
 ax1.legend(loc='lower right', fontsize=10)
@@ -400,7 +400,7 @@ if len(df_mc) > 0:
     ax1.set_yticks(x_pos)
     ax1.set_yticklabels(df_mc['Category'], fontsize=9)
     ax1.invert_yaxis()
-    ax1.set_xlabel('Frequency', fontsize=11, fontweight='bold')
+    ax1.set_xlabel('Number of Orders', fontsize=11, fontweight='bold')
     ax1.set_title('Top 5 Unapproved Abbreviations - MC System (EX)\n(Stacked by Site)', 
                   fontsize=12, fontweight='bold', pad=15)
     
@@ -444,7 +444,7 @@ if len(df_mc) > 0:
             ax.set_yticks(x_pos)
             ax.set_yticklabels(site_df['Category'], fontsize=8)
             ax.invert_yaxis()
-            ax.set_xlabel('Frequency', fontsize=10, fontweight='bold')
+            ax.set_xlabel('Number of Orders', fontsize=10, fontweight='bold')
             ax.set_title(f'MC Site: {site} (n={total_count:,})', 
                         fontsize=11, fontweight='bold', pad=10)
             ax.legend(loc='lower right', fontsize=8)
@@ -491,7 +491,7 @@ if len(df_mc) > 0:
             ax.set_yticks(x_pos)
             ax.set_yticklabels(site_df['Category'], fontsize=10)
             ax.invert_yaxis()
-            ax.set_xlabel('Frequency', fontsize=12, fontweight='bold')
+            ax.set_xlabel('Number of Orders', fontsize=12, fontweight='bold')
             ax.set_title(f'MC Site: {site} (n={total_count:,})', 
                         fontsize=14, fontweight='bold', pad=15)
             ax.legend(loc='lower right', fontsize=10)
@@ -631,7 +631,7 @@ if len(df_cs) > 0:
     ax1.set_yticks(x_pos)
     ax1.set_yticklabels(df_cs['Category'], fontsize=9)
     ax1.invert_yaxis()
-    ax1.set_xlabel('Frequency', fontsize=11, fontweight='bold')
+    ax1.set_xlabel('Number of Orders', fontsize=11, fontweight='bold')
     ax1.set_title('Top 5 Unapproved Abbreviations - CS System\n(Stacked by Site)', 
                   fontsize=12, fontweight='bold', pad=15)
     
@@ -675,7 +675,7 @@ if len(df_cs) > 0:
             ax.set_yticks(x_pos)
             ax.set_yticklabels(site_df['Category'], fontsize=8)
             ax.invert_yaxis()
-            ax.set_xlabel('Frequency', fontsize=10, fontweight='bold')
+            ax.set_xlabel('Number of Orders', fontsize=10, fontweight='bold')
             ax.set_title(f'CS Site: {site} (n={total_count:,})', 
                         fontsize=11, fontweight='bold', pad=10)
             ax.legend(loc='lower right', fontsize=8)
@@ -722,7 +722,7 @@ if len(df_cs) > 0:
             ax.set_yticks(x_pos)
             ax.set_yticklabels(site_df['Category'], fontsize=10)
             ax.invert_yaxis()
-            ax.set_xlabel('Frequency', fontsize=12, fontweight='bold')
+            ax.set_xlabel('Number of Orders', fontsize=12, fontweight='bold')
             ax.set_title(f'CS Site: {site} (n={total_count:,})', 
                         fontsize=14, fontweight='bold', pad=15)
             ax.legend(loc='lower right', fontsize=10)
@@ -1099,7 +1099,7 @@ if len(all_mc_sites) > 0:
             ax.set_yticks(x_pos)
             ax.set_yticklabels(site_df['Category'], fontsize=9)
             ax.invert_yaxis()
-            ax.set_xlabel('Frequency', fontsize=10, fontweight='bold')
+            ax.set_xlabel('Number of Orders', fontsize=10, fontweight='bold')
             site_total_orders = site_counts.get((site, 'EX'), 0)
             ax.set_title(f'MC Site: {site}\n(Top 5 by Frequency - {site_total_orders:,} Total Orders)', 
                         fontsize=11, fontweight='bold', pad=10)
@@ -1160,7 +1160,7 @@ if len(all_cs_sites) > 0:
             ax.set_yticks(x_pos)
             ax.set_yticklabels(site_df['Category'], fontsize=8)
             ax.invert_yaxis()
-            ax.set_xlabel('Frequency', fontsize=9, fontweight='bold')
+            ax.set_xlabel('Number of Orders', fontsize=9, fontweight='bold')
             site_total_orders = site_counts.get((site, 'CS'), 0)
             ax.set_title(f'CS Site: {site}\n(Top 5 by Frequency - {site_total_orders:,} Total Orders)', 
                         fontsize=10, fontweight='bold', pad=10)
