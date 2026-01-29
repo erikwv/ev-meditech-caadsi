@@ -360,7 +360,7 @@ if len(df_mc) > 0:
                 ax.text(total + 5, i, f'{int(total)}', ha='left', va='center',
                        fontweight='bold', fontsize=7)
     
-    plt.tight_layout()
+    plt.subplots_adjust(left=0.05, right=0.98, top=0.95, bottom=0.05, hspace=0.5, wspace=0.35)
     plt.savefig('Test Results/unapproved_abbreviations_mc_system.png', dpi=300, bbox_inches='tight')
     print("Figure 2 saved: Test Results/unapproved_abbreviations_mc_system.png")
     plt.close()
@@ -591,7 +591,7 @@ if len(df_cs) > 0:
                 ax.text(total + 5, i, f'{int(total)}', ha='left', va='center',
                        fontweight='bold', fontsize=7)
     
-    plt.subplots_adjust(left=0.05, right=0.98, top=0.95, bottom=0.05, hspace=0.4, wspace=0.40)
+    plt.subplots_adjust(left=0.05, right=0.98, top=0.95, bottom=0.05, hspace=0.5, wspace=0.40)
     plt.savefig('Test Results/unapproved_abbreviations_cs_system.png', dpi=300)
     print("Figure 3 saved: Test Results/unapproved_abbreviations_cs_system.png")
     plt.close()
@@ -777,7 +777,7 @@ if len(all_mc_sites) > 0:
                 max_pct = site_df['Pct'].max()
                 ax.set_xlim(0, max_pct * 1.15)
     
-    plt.tight_layout()
+    plt.subplots_adjust(left=0.08, right=0.95, top=0.95, bottom=0.05, hspace=0.5, wspace=0.3)
     plt.savefig('Test Results/unapproved_abbreviations_mc_sites_top5_pct_total.png', dpi=300, bbox_inches='tight')
     print("Figure 4 saved: Test Results/unapproved_abbreviations_mc_sites_top5_pct_total.png")
     plt.close()
@@ -838,7 +838,7 @@ if len(all_cs_sites) > 0:
                 max_pct = site_df['Pct'].max()
                 ax.set_xlim(0, max_pct * 1.15)
     
-    plt.tight_layout()
+    plt.subplots_adjust(left=0.05, right=0.98, top=0.95, bottom=0.05, hspace=0.5, wspace=0.35)
     plt.savefig('Test Results/unapproved_abbreviations_cs_sites_top5_pct_total.png', dpi=300, bbox_inches='tight')
     print("Figure 5 saved: Test Results/unapproved_abbreviations_cs_sites_top5_pct_total.png")
     plt.close()
@@ -899,7 +899,7 @@ if len(all_mc_sites) > 0:
                 max_pct = site_df['Pct'].max()
                 ax.set_xlim(0, max_pct * 1.15)
     
-    plt.tight_layout()
+    plt.subplots_adjust(left=0.08, right=0.95, top=0.95, bottom=0.05, hspace=0.5, wspace=0.3)
     plt.savefig('Test Results/unapproved_abbreviations_mc_sites_top3_pct_total.png', dpi=300, bbox_inches='tight')
     print("Figure 6 saved: Test Results/unapproved_abbreviations_mc_sites_top3_pct_total.png")
     plt.close()
@@ -960,7 +960,7 @@ if len(all_cs_sites) > 0:
                 max_pct = site_df['Pct'].max()
                 ax.set_xlim(0, max_pct * 1.15)
     
-    plt.tight_layout()
+    plt.subplots_adjust(left=0.05, right=0.98, top=0.95, bottom=0.05, hspace=0.5, wspace=0.35)
     plt.savefig('Test Results/unapproved_abbreviations_cs_sites_top3_pct_total.png', dpi=300, bbox_inches='tight')
     print("Figure 7 saved: Test Results/unapproved_abbreviations_cs_sites_top3_pct_total.png")
     plt.close()
@@ -1021,7 +1021,7 @@ if len(all_mc_sites) > 0:
                 max_total = site_df['Total'].max()
                 ax.set_xlim(0, max_total * 1.15)
     
-    plt.tight_layout()
+    plt.subplots_adjust(left=0.08, right=0.95, top=0.95, bottom=0.05, hspace=0.5, wspace=0.3)
     plt.savefig('Test Results/unapproved_abbreviations_mc_sites_top5_freq.png', dpi=300, bbox_inches='tight')
     print("Figure 8 saved: Test Results/unapproved_abbreviations_mc_sites_top5_freq.png")
     plt.close()
@@ -1082,7 +1082,7 @@ if len(all_cs_sites) > 0:
                 max_total = site_df['Total'].max()
                 ax.set_xlim(0, max_total * 1.15)
     
-    plt.tight_layout()
+    plt.subplots_adjust(left=0.05, right=0.98, top=0.95, bottom=0.05, hspace=0.5, wspace=0.35)
     plt.savefig('Test Results/unapproved_abbreviations_cs_sites_top5_freq.png', dpi=300, bbox_inches='tight')
     print("Figure 9 saved: Test Results/unapproved_abbreviations_cs_sites_top5_freq.png")
     plt.close()
