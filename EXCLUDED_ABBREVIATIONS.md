@@ -103,6 +103,36 @@ Monitor for false positives in future updates.
 
 ---
 
+## MS (Morphine Sulfate / Magnesium Sulfate)
+
+**ISMP Status:** ❌ Do Not Use  
+**Preferred:** Morphine sulfate, magnesium sulfate (spell out)  
+**Detection Status:** ✅ INCLUDED with filtering
+
+### Filtering Applied (2026-01-29)
+
+**Problem:** MS has two common false positive patterns:
+1. **Milliseconds:** "500 ms", "500 MS", "QTC > 500ms"
+2. **MS Trial:** Clinical trial references like "MS Trial", "MS trial"
+
+**Solution:** Pattern now requires:
+- A mass measurement unit (mg, g, gm, mcg) immediately before MS
+- Proper spacing: `mg MS ` (with space after MS)
+
+**Examples:**
+- ✅ True Positive: "20mg MS PO", "10 mg MS IV"
+- ❌ False Positive (filtered): "500 ms", "QTC > 500ms", "MS Trial"
+
+**Pattern Used:**
+```sql
+SELECT 'PAT', '%mg MS %',    'MS (Morphine or Magnesium Sulfate)'
+SELECT 'PAT', '%g MS %',     'MS (Morphine or Magnesium Sulfate)'
+SELECT 'PAT', '%gm MS %',    'MS (Morphine or Magnesium Sulfate)'
+SELECT 'PAT', '%mcg MS %',   'MS (Morphine or Magnesium Sulfate)'
+```
+
+---
+
 ## Detection Statistics (2025-01-29 Update)
 
 | Abbreviation | Instances Detected | Estimated False Positive Rate |
@@ -115,7 +145,7 @@ Monitor for false positives in future updates.
 | x/7 | 122 | <1% |
 | IU | 117 | <1% |
 | OD | 110 | ~5% |
-| MS | 60 | <5% |
+| MS | 60 → TBD after rerun | <1% (with new filter) |
 | ii (Roman) | 48 | <5% |
 | **AS** | **EXCLUDED** | **~100%** |
 | **I** | **EXCLUDED** | **~99%** |

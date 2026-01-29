@@ -8,10 +8,14 @@ import seaborn as sns
 from collections import Counter
 import pandas as pd
 import math
+import os
 
 # Set style
 sns.set_style("whitegrid")
 plt.rcParams['figure.figsize'] = (14, 10)
+
+# Create directory for individual site charts
+os.makedirs('Test Results/individual_sites', exist_ok=True)
 
 # Read the flagged orders data (updated with corrected AS pattern filtering)
 with open('Test Results/unap_abbrev_mt_2025-01-19_2025-01-29_update.csv', 'r', encoding='utf-8-sig') as f:
@@ -358,6 +362,57 @@ if len(df_mc) > 0:
     plt.savefig('Test Results/unapproved_abbreviations_mc_system.png', dpi=300, bbox_inches='tight')
     print("Figure 2 saved: Test Results/unapproved_abbreviations_mc_system.png")
     plt.close()
+    
+    # Save individual site charts (frequency-based)
+    for site, total_count in all_mc_sites:
+        fig_individual = plt.figure(figsize=(10, 6))
+        ax = plt.subplot(1, 1, 1)
+        
+        # Get top 5 abbreviations for this site
+        site_data = []
+        all_abbrevs = set(list(mc_sites[site]['dose'].keys()) + list(mc_sites[site]['label'].keys()))
+        for abbrev in all_abbrevs:
+            dose_count = mc_sites[site]['dose'].get(abbrev, 0)
+            label_count = mc_sites[site]['label'].get(abbrev, 0)
+            site_data.append({
+                'Category': abbrev,
+                'Dose Instructions': dose_count,
+                'Label Comments': label_count,
+                'Total': dose_count + label_count
+            })
+        
+        site_df = pd.DataFrame(site_data).sort_values('Total', ascending=False).head(5)
+        
+        if len(site_df) > 0:
+            x_pos = range(len(site_df))
+            width = 0.6
+            p1 = ax.barh(x_pos, site_df['Dose Instructions'], width, label='Dose Instructions', color='#e74c3c')
+            p2 = ax.barh(x_pos, site_df['Label Comments'], width, left=site_df['Dose Instructions'], 
+                        label='Label Comments', color='#3498db')
+            
+            ax.set_yticks(x_pos)
+            ax.set_yticklabels(site_df['Category'], fontsize=10)
+            ax.invert_yaxis()
+            ax.set_xlabel('Frequency', fontsize=12, fontweight='bold')
+            ax.set_title(f'MC Site: {site} (n={total_count:,})', 
+                        fontsize=14, fontweight='bold', pad=15)
+            ax.legend(loc='lower right', fontsize=10)
+            ax.grid(axis='x', alpha=0.3)
+            
+            # Add value labels
+            for i, (idx_row, row) in enumerate(site_df.iterrows()):
+                total = row['Total']
+                ax.text(total * 1.05, i, f'{int(total)}', ha='left', va='center',
+                       fontweight='bold', fontsize=9)
+            
+            # Set x-axis limits to keep labels in frame
+            if len(site_df) > 0:
+                max_total = site_df['Total'].max()
+                ax.set_xlim(0, max_total * 1.15)
+            
+            plt.tight_layout()
+            plt.savefig(f'Test Results/individual_sites/mc_{site}_freq.png', dpi=300, bbox_inches='tight')
+            plt.close()
 
 # ============================================================================
 # FIGURE 2B: MC (EX) System Analysis - PERCENTAGE OF ORDERS
@@ -534,6 +589,57 @@ if len(df_cs) > 0:
     plt.savefig('Test Results/unapproved_abbreviations_cs_system.png', dpi=300, bbox_inches='tight')
     print("Figure 3 saved: Test Results/unapproved_abbreviations_cs_system.png")
     plt.close()
+    
+    # Save individual site charts (frequency-based)
+    for site, total_count in all_cs_sites:
+        fig_individual = plt.figure(figsize=(10, 6))
+        ax = plt.subplot(1, 1, 1)
+        
+        # Get top 5 abbreviations for this site
+        site_data = []
+        all_abbrevs = set(list(cs_sites[site]['dose'].keys()) + list(cs_sites[site]['label'].keys()))
+        for abbrev in all_abbrevs:
+            dose_count = cs_sites[site]['dose'].get(abbrev, 0)
+            label_count = cs_sites[site]['label'].get(abbrev, 0)
+            site_data.append({
+                'Category': abbrev,
+                'Dose Instructions': dose_count,
+                'Label Comments': label_count,
+                'Total': dose_count + label_count
+            })
+        
+        site_df = pd.DataFrame(site_data).sort_values('Total', ascending=False).head(5)
+        
+        if len(site_df) > 0:
+            x_pos = range(len(site_df))
+            width = 0.6
+            p1 = ax.barh(x_pos, site_df['Dose Instructions'], width, label='Dose Instructions', color='#e74c3c')
+            p2 = ax.barh(x_pos, site_df['Label Comments'], width, left=site_df['Dose Instructions'], 
+                        label='Label Comments', color='#3498db')
+            
+            ax.set_yticks(x_pos)
+            ax.set_yticklabels(site_df['Category'], fontsize=10)
+            ax.invert_yaxis()
+            ax.set_xlabel('Frequency', fontsize=12, fontweight='bold')
+            ax.set_title(f'CS Site: {site} (n={total_count:,})', 
+                        fontsize=14, fontweight='bold', pad=15)
+            ax.legend(loc='lower right', fontsize=10)
+            ax.grid(axis='x', alpha=0.3)
+            
+            # Add value labels
+            for i, (idx_row, row) in enumerate(site_df.iterrows()):
+                total = row['Total']
+                ax.text(total * 1.05, i, f'{int(total)}', ha='left', va='center',
+                       fontweight='bold', fontsize=9)
+            
+            # Set x-axis limits to keep labels in frame
+            if len(site_df) > 0:
+                max_total = site_df['Total'].max()
+                ax.set_xlim(0, max_total * 1.15)
+            
+            plt.tight_layout()
+            plt.savefig(f'Test Results/individual_sites/cs_{site}_freq.png', dpi=300, bbox_inches='tight')
+            plt.close()
 
 # ============================================================================
 # FIGURE 3B: CS System Analysis - PERCENTAGE OF ORDERS
@@ -894,6 +1000,11 @@ if len(all_mc_sites) > 0:
                 total = row['Total']
                 ax.text(total * 1.05, i, f'{int(total)}', ha='left', va='center',
                        fontweight='bold', fontsize=8)
+            
+            # Set x-axis limits to keep labels in frame
+            if len(site_df) > 0:
+                max_total = site_df['Total'].max()
+                ax.set_xlim(0, max_total * 1.15)
     
     plt.tight_layout()
     plt.savefig('Test Results/unapproved_abbreviations_mc_sites_top5_freq.png', dpi=300, bbox_inches='tight')
@@ -950,6 +1061,11 @@ if len(all_cs_sites) > 0:
                 total = row['Total']
                 ax.text(total * 1.05, i, f'{int(total)}', ha='left', va='center',
                        fontweight='bold', fontsize=7)
+            
+            # Set x-axis limits to keep labels in frame
+            if len(site_df) > 0:
+                max_total = site_df['Total'].max()
+                ax.set_xlim(0, max_total * 1.15)
     
     plt.tight_layout()
     plt.savefig('Test Results/unapproved_abbreviations_cs_sites_top5_freq.png', dpi=300, bbox_inches='tight')

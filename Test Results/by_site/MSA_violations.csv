@@ -1,0 +1,2 @@
+Site,System,Order Number,Order Entered,Order Type,StartDate,StopDate,Provider,Drug Mnemonic,Generic Name,DIN,Dose,RangeDoseLow,RangeDoseHigh,Schedule,Dose Unit,Dosage Form,Route,Frequency,Label Comment,Dose Instructions,Flagged,FlaggedInDose,FlaggedInLabel
+MSA,CS,MS00394586,20250316,MEDM,20250316,NULL,CHANW,HYDRA10T,hydralazine 10 mg tab,00441619,10,NULL,NULL,PRN,MG,TAB,PO,BID PRN,IF SBP > greater than 180,NULL,< or > (Comparison Symbol),NULL,< or > (Comparison Symbol)

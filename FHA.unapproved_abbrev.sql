@@ -80,8 +80,14 @@ WITH Forbidden (MatchType, Pattern, Meaning) AS (
     SELECT 'PAT', '%[0-9]\.0[^0-9]%', 'Trailing zero (e.g., 1.0 mg)' UNION ALL
     SELECT 'PAT', '%[^0-9]\.[0-9]%',  'Missing leading zero (e.g., .5 mg)' UNION ALL
 
-    -- MS abbreviations
-    SELECT 'PAT', '%[^A-Za-z]MS[^A-Za-z]%',    'MS (Morphine or Magnesium Sulfate)' UNION ALL
+    -- MS abbreviations (exclude milliseconds and trial patterns)
+    -- True positives: "20mg MS PO", "10 mg MS IV"
+    -- False positives: "500 ms", "500 MS", "QTC > 500ms", "MS Trial", "MS trial"
+    -- Pattern requires: mass unit (mg/g/mcg/gm) followed by MS (with space), not at end of string
+    SELECT 'PAT', '%mg MS %',    'MS (Morphine or Magnesium Sulfate)' UNION ALL
+    SELECT 'PAT', '%g MS %',     'MS (Morphine or Magnesium Sulfate)' UNION ALL
+    SELECT 'PAT', '%gm MS %',    'MS (Morphine or Magnesium Sulfate)' UNION ALL
+    SELECT 'PAT', '%mcg MS %',   'MS (Morphine or Magnesium Sulfate)' UNION ALL
     SELECT 'PAT', '%[^A-Za-z]MSO4[^A-Za-z]%',  'MSO4 (Morphine or Magnesium Sulfate)' UNION ALL
     SELECT 'PAT', '%[^A-Za-z]MgSO4[^A-Za-z]%', 'MgSO4 (Magnesium Sulfate)' UNION ALL
 
