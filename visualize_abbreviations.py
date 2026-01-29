@@ -207,6 +207,102 @@ for idx, row in df_cs_pct.iterrows():
     df_cs_pct.at[idx, 'Pct_of_Orders'] = pct_of_orders
 
 # ============================================================================
+# FIGURE 0: Comprehensive Overview (Analysis Summary)
+# ============================================================================
+fig0 = plt.figure(figsize=(18, 10))
+
+# Overall Top 5
+ax0_1 = plt.subplot(1, 3, 1)
+x_pos = range(len(df))
+width = 0.6
+
+p1 = ax0_1.barh(x_pos, df['Dose Instructions'], width, label='Dose Instructions', color='#e74c3c')
+p2 = ax0_1.barh(x_pos, df['Label Comments'], width, left=df['Dose Instructions'], 
+              label='Label Comments', color='#3498db')
+
+ax0_1.set_yticks(x_pos)
+ax0_1.set_yticklabels(df['Category'], fontsize=10)
+ax0_1.invert_yaxis()
+ax0_1.set_xlabel('Frequency', fontsize=11, fontweight='bold')
+ax0_1.set_title(f'Top 5 Overall\n({len(data):,} Flagged Orders)', 
+              fontsize=12, fontweight='bold', pad=10)
+ax0_1.legend(loc='lower right', fontsize=9)
+ax0_1.grid(axis='x', alpha=0.3)
+
+# Add value labels
+for i, (idx, row) in enumerate(df.iterrows()):
+    total = row['Total']
+    ax0_1.text(total * 1.02, i, f'{int(total)}', ha='left', va='center',
+            fontweight='bold', fontsize=9)
+
+# Set x-axis limits
+if len(df) > 0:
+    max_total = df['Total'].max()
+    ax0_1.set_xlim(0, max_total * 1.15)
+
+# MC Top 5
+ax0_2 = plt.subplot(1, 3, 2)
+if len(df_mc) > 0:
+    x_pos = range(len(df_mc))
+    p1 = ax0_2.barh(x_pos, df_mc['Dose Instructions'], width, label='Dose Instructions', color='#e74c3c')
+    p2 = ax0_2.barh(x_pos, df_mc['Label Comments'], width, left=df_mc['Dose Instructions'], 
+                  label='Label Comments', color='#3498db')
+    
+    ax0_2.set_yticks(x_pos)
+    ax0_2.set_yticklabels(df_mc['Category'], fontsize=10)
+    ax0_2.invert_yaxis()
+    ax0_2.set_xlabel('Frequency', fontsize=11, fontweight='bold')
+    ax0_2.set_title(f'Top 5 MC System\n({len(mc_order_ids):,} Flagged Orders)', 
+                  fontsize=12, fontweight='bold', pad=10)
+    ax0_2.legend(loc='lower right', fontsize=9)
+    ax0_2.grid(axis='x', alpha=0.3)
+    
+    # Add value labels
+    for i, (idx, row) in enumerate(df_mc.iterrows()):
+        total = row['Total']
+        ax0_2.text(total * 1.02, i, f'{int(total)}', ha='left', va='center',
+                fontweight='bold', fontsize=9)
+    
+    # Set x-axis limits
+    if len(df_mc) > 0:
+        max_total = df_mc['Total'].max()
+        ax0_2.set_xlim(0, max_total * 1.15)
+
+# CS Top 5
+ax0_3 = plt.subplot(1, 3, 3)
+if len(df_cs) > 0:
+    x_pos = range(len(df_cs))
+    p1 = ax0_3.barh(x_pos, df_cs['Dose Instructions'], width, label='Dose Instructions', color='#e74c3c')
+    p2 = ax0_3.barh(x_pos, df_cs['Label Comments'], width, left=df_cs['Dose Instructions'], 
+                  label='Label Comments', color='#3498db')
+    
+    ax0_3.set_yticks(x_pos)
+    ax0_3.set_yticklabels(df_cs['Category'], fontsize=10)
+    ax0_3.invert_yaxis()
+    ax0_3.set_xlabel('Frequency', fontsize=11, fontweight='bold')
+    ax0_3.set_title(f'Top 5 CS System\n({len(cs_order_ids):,} Flagged Orders)', 
+                  fontsize=12, fontweight='bold', pad=10)
+    ax0_3.legend(loc='lower right', fontsize=9)
+    ax0_3.grid(axis='x', alpha=0.3)
+    
+    # Add value labels
+    for i, (idx, row) in enumerate(df_cs.iterrows()):
+        total = row['Total']
+        ax0_3.text(total * 1.02, i, f'{int(total)}', ha='left', va='center',
+                fontweight='bold', fontsize=9)
+    
+    # Set x-axis limits
+    if len(df_cs) > 0:
+        max_total = df_cs['Total'].max()
+        ax0_3.set_xlim(0, max_total * 1.15)
+
+plt.suptitle('Unapproved Abbreviations Analysis Overview', fontsize=16, fontweight='bold', y=0.98)
+plt.tight_layout(rect=[0, 0, 1, 0.96])
+plt.savefig('Test Results/sys_sum_ua_figs/unapproved_abbreviations_analysis.png', dpi=300, bbox_inches='tight')
+print("Figure 0 saved: Test Results/sys_sum_ua_figs/unapproved_abbreviations_analysis.png")
+plt.close()
+
+# ============================================================================
 # FIGURE 1: Overall Top 5 Abbreviations
 # ============================================================================
 fig1 = plt.figure(figsize=(12, 8))
