@@ -55,21 +55,18 @@ WITH Forbidden (MatchType, Pattern, Meaning) AS (
     SELECT 'CHAR', ' EOD ', 'EOD (Every Other Day)' UNION ALL
     SELECT 'CHAR', ' eod ', 'EOD (Every Other Day)' UNION ALL
 
-    -- Ear abbreviations (require AS/AD/AU immediately after drop/gtt to avoid false positives)
-    -- Note: gtt/gtts is an approved abbreviation for drops, but AD/AS/AU are not approved for ears
-    -- Pattern matches: "1 drop AD" or "2 drops AS" but NOT "drops as needed" or "drop as per"
+    -- Ear abbreviations (AD and AU only - AS excluded due to false positives)
+    -- AS generates too many false positives ("as needed", "as per", "drops as", etc.)
+    -- AD and AU don't have this problem since "ad" and "au" are not common English words
     SELECT 'PAT', '%drop AD %',  'AD (Right Ear)' UNION ALL
     SELECT 'PAT', '%drops AD %', 'AD (Right Ear)' UNION ALL
     SELECT 'PAT', '%gtt AD %',   'AD (Right Ear)' UNION ALL
     SELECT 'PAT', '%gtts AD %',  'AD (Right Ear)' UNION ALL
-    SELECT 'PAT', '%drop AS %',  'AS (Left Ear)' UNION ALL
-    SELECT 'PAT', '%drops AS %', 'AS (Left Ear)' UNION ALL
-    SELECT 'PAT', '%gtt AS %',   'AS (Left Ear)' UNION ALL
-    SELECT 'PAT', '%gtts AS %',  'AS (Left Ear)' UNION ALL
     SELECT 'PAT', '%drop AU %',  'AU (Both Ears)' UNION ALL
     SELECT 'PAT', '%drops AU %', 'AU (Both Ears)' UNION ALL
     SELECT 'PAT', '%gtt AU %',   'AU (Both Ears)' UNION ALL
     SELECT 'PAT', '%gtts AU %',  'AU (Both Ears)' UNION ALL
+    -- NOTE: AS (Left Ear) is EXCLUDED - see EXCLUDED_ABBREVIATIONS.md
 
     -- Eye abbreviations
     SELECT 'PAT', '%[0-9]OS %',  'OS (Left Eye)' UNION ALL
