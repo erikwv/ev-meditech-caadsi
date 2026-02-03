@@ -10,23 +10,36 @@ This repository contains SQL queries and documentation for extracting and analyz
 
 ### Production Query
 - **FHA.unapproved_abbrev.sql** - Production-ready ISMP Canada Do Not Use abbreviation detection query
+  - Date range: January 1, 2025 - December 31, 2025
   - 83-89% ISMP coverage (15-16 of 18 items)
   - Scans both dose instructions and label comments
   - Token-aware pattern matching to minimize false positives
   - SQL Server 2017-2019 compatible
+
+### Visualization Scripts
+- **visualize_abbreviations.py** - Generates comprehensive analysis visualizations
+  - System-level summary figures (12 figures)
+  - Site-specific frequency charts (15+ individual sites)
+  - Stacked bar charts showing abbreviation distribution by site
+  - Percentage-based analysis relative to total orders
+- **split_by_site.py** - Generates site-specific CSV files for stakeholder distribution
 
 ### Directories
 - **Archive/** - Historical alternate query versions (reference only)
 - **HDPBC Queries/** - High-Dose Parenteral B12 related queries
 - **ISMP-CDN Docs/** - ISMP Canada Do Not Use List documentation (PDF)
 - **JIRA Files/** - JIRA ticket references and sample queries
-- **Test Results/** - Test data and transaction samples (CSV)
+- **Test Results/** - Query results, visualizations, and site-specific data
+  - **sys_sum_ua_figs/** - System summary visualizations (12 figures)
+  - **site_spec_ua_figs/** - Individual site frequency charts (15+ sites)
+  - **site_ua_data/** - Site-specific CSV files for stakeholder distribution
 - **SQL Metadata/** - Query metadata and field definitions
 - **FHA_ANALYTICS db info/** - Database connection information
 
 ### Documentation
 - **ANALYSIS_UNAPPROVED_ABBREVIATIONS.md** - Comprehensive query analysis and coverage details
 - **MULTIPLE_DETECTION.md** - Multiple abbreviation detection capabilities documentation
+- **EXCLUDED_ABBREVIATIONS.md** - Documentation of excluded patterns and false positive filtering
 - **ISMPCanadaDoNotUseList-2025.csv** - CSV version of ISMP Canada Do Not Use List
 - **meditech_segment_sql_tables.txt** - Meditech segment to SQL table mapping
 - **PHA.RX Segment and Field Definitions.txt** - Meditech PHA.RX data model documentation
@@ -41,7 +54,8 @@ Comprehensive medication safety monitoring query that detects ISMP Canada 2025 D
 - Scans both dose instructions AND label comments
 - Multiple abbreviations detected per order
 - Source location tracking (dose vs label)
-- Parameterized date range (@StartDate, @EndDate)
+- Fixed date range: January 1, 2025 - December 31, 2025
+- MS false positive filtering (excludes milliseconds and trial references)
 
 **Currently Detected (15-16 of 18 ISMP items)**:
 - Unit abbreviations: U, IU, µg (microgram symbol), cc
@@ -50,8 +64,8 @@ Comprehensive medication safety monitoring query that detects ISMP Canada 2025 D
 - Symbols: <, >, ≥, ≤, @
 - Clinical abbreviation: D/C (token-aware with word boundaries)
 - Numeric safety: Trailing zeros (X.0), Missing leading zeros (.X)
-- Ambiguous drug names: MS, MSO4, MgSO4
-- Roman numerals: II, III only (I/IV intentionally excluded)
+- Ambiguous drug names: MS, MSO4, MgSO4 (with false positive filtering)
+- Roman numerals: ii, II, iii, III (I/IV intentionally excluded)
 - Time notation: x/7, y/52
 - Dot notation: Ṫ, ṪṪ, ṪṪṪ
 
@@ -93,9 +107,21 @@ Evolved through 25+ commits with refinements:
 
 ### Running the Query
 ```sql
--- Production query - detects ISMP abbreviations in previous calendar year
--- Returns up to 100 flagged orders
+-- Production query - detects ISMP abbreviations for calendar year 2025
+-- Returns all flagged orders with three result sets:
+-- 1. Detailed flagged orders
+-- 2. Total order counts by site and system
+-- 3. Total order counts by system and grand total
 EXEC FHA.unapproved_abbrev.sql
+```
+
+### Generating Visualizations
+```bash
+# Generate all analysis visualizations (27 figures total)
+python3 visualize_abbreviations.py
+
+# Generate site-specific CSV files for distribution
+python3 split_by_site.py
 ```
 
 ### Output Columns (20 total)

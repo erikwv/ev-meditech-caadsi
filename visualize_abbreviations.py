@@ -224,7 +224,7 @@ ax0_1.set_yticks(x_pos)
 ax0_1.set_yticklabels(df['Category'], fontsize=10)
 ax0_1.invert_yaxis()
 ax0_1.set_xlabel('Number of Orders', fontsize=11, fontweight='bold')
-ax0_1.set_title(f'Top 5 Overall\n({len(data):,} Flagged Orders)', 
+ax0_1.set_title(f'Top 5 Overall\n(Jan 1, 2025 - Dec 31, 2025)\n({len(data):,} Flagged Orders)', 
               fontsize=12, fontweight='bold', pad=10)
 ax0_1.legend(loc='lower right', fontsize=9)
 ax0_1.grid(axis='x', alpha=0.3)
@@ -252,7 +252,7 @@ if len(df_mc) > 0:
     ax0_2.set_yticklabels(df_mc['Category'], fontsize=10)
     ax0_2.invert_yaxis()
     ax0_2.set_xlabel('Number of Orders', fontsize=11, fontweight='bold')
-    ax0_2.set_title(f'Top 5 MC System\n({len(mc_order_ids):,} Flagged Orders)', 
+    ax0_2.set_title(f'Top 5 MC System\n(Jan 1, 2025 - Dec 31, 2025)\n({len(mc_order_ids):,} Flagged Orders)', 
                   fontsize=12, fontweight='bold', pad=10)
     ax0_2.legend(loc='lower right', fontsize=9)
     ax0_2.grid(axis='x', alpha=0.3)
@@ -280,7 +280,7 @@ if len(df_cs) > 0:
     ax0_3.set_yticklabels(df_cs['Category'], fontsize=10)
     ax0_3.invert_yaxis()
     ax0_3.set_xlabel('Number of Orders', fontsize=11, fontweight='bold')
-    ax0_3.set_title(f'Top 5 CS System\n({len(cs_order_ids):,} Flagged Orders)', 
+    ax0_3.set_title(f'Top 5 CS System\n(Jan 1, 2025 - Dec 31, 2025)\n({len(cs_order_ids):,} Flagged Orders)', 
                   fontsize=12, fontweight='bold', pad=10)
     ax0_3.legend(loc='lower right', fontsize=9)
     ax0_3.grid(axis='x', alpha=0.3)
@@ -318,7 +318,7 @@ ax1.set_yticks(x_pos)
 ax1.set_yticklabels(df['Category'], fontsize=11)
 ax1.invert_yaxis()
 ax1.set_xlabel('Number of Orders', fontsize=12, fontweight='bold')
-ax1.set_title('Top 5 Unapproved Abbreviations (Overall)\n(Dose Instructions vs Label Comments)', 
+ax1.set_title('Top 5 Unapproved Abbreviations (Overall)\n(Jan 1, 2025 - Dec 31, 2025)\n(Dose Instructions vs Label Comments)', 
               fontsize=14, fontweight='bold', pad=15)
 ax1.legend(loc='lower right', fontsize=10)
 ax1.grid(axis='x', alpha=0.3)
@@ -401,7 +401,7 @@ if len(df_mc) > 0:
     ax1.set_yticklabels(df_mc['Category'], fontsize=9)
     ax1.invert_yaxis()
     ax1.set_xlabel('Number of Orders', fontsize=11, fontweight='bold')
-    ax1.set_title('Top 5 Unapproved Abbreviations - MC System (EX)\n(Stacked by Site)', 
+    ax1.set_title('Top 5 Unapproved Abbreviations - MC System (EX)\n(Jan 1, 2025 - Dec 31, 2025)\n(Stacked by Site)', 
                   fontsize=12, fontweight='bold', pad=15)
     
     # Create legend with unique site labels only
@@ -445,7 +445,7 @@ if len(df_mc) > 0:
             ax.set_yticklabels(site_df['Category'], fontsize=8)
             ax.invert_yaxis()
             ax.set_xlabel('Number of Orders', fontsize=10, fontweight='bold')
-            ax.set_title(f'MC Site: {site} (n={total_count:,})', 
+            ax.set_title(f'MC Site: {site}\n(Jan 1, 2025 - Dec 31, 2025)\n(n={total_count:,})', 
                         fontsize=11, fontweight='bold', pad=10)
             ax.legend(loc='lower right', fontsize=8)
             ax.grid(axis='x', alpha=0.3)
@@ -482,6 +482,10 @@ if len(df_mc) > 0:
         site_df = pd.DataFrame(site_data).sort_values('Total', ascending=False).head(5)
         
         if len(site_df) > 0:
+            # Get total orders for this site and calculate percentage
+            site_total_orders = site_counts.get((site, 'EX'), len(mc_sites[site]['orders']))
+            site_pct = (total_count / site_total_orders * 100) if site_total_orders > 0 else 0
+            
             x_pos = range(len(site_df))
             width = 0.6
             p1 = ax.barh(x_pos, site_df['Dose Instructions'], width, label='Dose Instructions', color='#e74c3c')
@@ -492,8 +496,8 @@ if len(df_mc) > 0:
             ax.set_yticklabels(site_df['Category'], fontsize=10)
             ax.invert_yaxis()
             ax.set_xlabel('Number of Orders', fontsize=12, fontweight='bold')
-            ax.set_title(f'MC Site: {site} (n={total_count:,})', 
-                        fontsize=14, fontweight='bold', pad=15)
+            ax.set_title(f'ISMP Do Not Use Abbreviations Usage in Meditech\nMC Site: {site} (Jan 1, 2025 - Dec 31, 2025)\nTop 5 by Frequency - n = {total_count:,} ({site_pct:.2f}% of {site_total_orders:,} total orders)', 
+                        fontsize=12, fontweight='bold', pad=15)
             ax.legend(loc='lower right', fontsize=10)
             ax.grid(axis='x', alpha=0.3)
             
@@ -554,7 +558,7 @@ if len(df_mc_pct) > 0:
     ax1.set_yticklabels(df_mc_pct['Category'], fontsize=10)
     ax1.invert_yaxis()
     ax1.set_xlabel('% of Orders', fontsize=12, fontweight='bold')
-    ax1.set_title(f'Top 5 Unapproved Abbreviations - MC System (EX)\n(% of {mc_orders:,} Orders - Stacked by Site)', 
+    ax1.set_title(f'Top 5 Unapproved Abbreviations - MC System (EX)\n(Jan 1, 2025 - Dec 31, 2025)\n(% of {mc_orders:,} Orders - Stacked by Site)', 
                   fontsize=13, fontweight='bold', pad=15)
     
     # Create legend with unique site labels only
@@ -632,7 +636,7 @@ if len(df_cs) > 0:
     ax1.set_yticklabels(df_cs['Category'], fontsize=9)
     ax1.invert_yaxis()
     ax1.set_xlabel('Number of Orders', fontsize=11, fontweight='bold')
-    ax1.set_title('Top 5 Unapproved Abbreviations - CS System\n(Stacked by Site)', 
+    ax1.set_title('Top 5 Unapproved Abbreviations - CS System\n(Jan 1, 2025 - Dec 31, 2025)\n(Stacked by Site)', 
                   fontsize=12, fontweight='bold', pad=15)
     
     # Create legend with unique site labels only
@@ -676,7 +680,7 @@ if len(df_cs) > 0:
             ax.set_yticklabels(site_df['Category'], fontsize=8)
             ax.invert_yaxis()
             ax.set_xlabel('Number of Orders', fontsize=10, fontweight='bold')
-            ax.set_title(f'CS Site: {site} (n={total_count:,})', 
+            ax.set_title(f'CS Site: {site}\n(Jan 1, 2025 - Dec 31, 2025)\n(n={total_count:,})', 
                         fontsize=11, fontweight='bold', pad=10)
             ax.legend(loc='lower right', fontsize=8)
             ax.grid(axis='x', alpha=0.3)
@@ -713,6 +717,10 @@ if len(df_cs) > 0:
         site_df = pd.DataFrame(site_data).sort_values('Total', ascending=False).head(5)
         
         if len(site_df) > 0:
+            # Get total orders for this site and calculate percentage
+            site_total_orders = site_counts.get((site, 'CS'), len(cs_sites[site]['orders']))
+            site_pct = (total_count / site_total_orders * 100) if site_total_orders > 0 else 0
+            
             x_pos = range(len(site_df))
             width = 0.6
             p1 = ax.barh(x_pos, site_df['Dose Instructions'], width, label='Dose Instructions', color='#e74c3c')
@@ -723,8 +731,8 @@ if len(df_cs) > 0:
             ax.set_yticklabels(site_df['Category'], fontsize=10)
             ax.invert_yaxis()
             ax.set_xlabel('Number of Orders', fontsize=12, fontweight='bold')
-            ax.set_title(f'CS Site: {site} (n={total_count:,})', 
-                        fontsize=14, fontweight='bold', pad=15)
+            ax.set_title(f'ISMP Do Not Use Abbreviations Usage in Meditech\nCS Site: {site} (Jan 1, 2025 - Dec 31, 2025)\nTop 5 by Frequency - n = {total_count:,} ({site_pct:.2f}% of {site_total_orders:,} total orders)', 
+                        fontsize=12, fontweight='bold', pad=15)
             ax.legend(loc='lower right', fontsize=10)
             ax.grid(axis='x', alpha=0.3)
             
@@ -791,7 +799,7 @@ if len(df_cs_pct) > 0:
     ax1.set_yticklabels(df_cs_pct['Category'], fontsize=10)
     ax1.invert_yaxis()
     ax1.set_xlabel('% of Orders', fontsize=12, fontweight='bold')
-    ax1.set_title(f'Top 5 Unapproved Abbreviations - CS System\n(% of {cs_orders:,} Orders - Stacked by Site)', 
+    ax1.set_title(f'Top 5 Unapproved Abbreviations - CS System\n(Jan 1, 2025 - Dec 31, 2025)\n(% of {cs_orders:,} Orders - Stacked by Site)', 
                   fontsize=13, fontweight='bold', pad=15)
     
     # Create legend with unique site labels only
@@ -858,7 +866,7 @@ if len(all_mc_sites) > 0:
             ax.set_yticklabels(site_df['Category'], fontsize=9)
             ax.invert_yaxis()
             ax.set_xlabel('% of Total Site Orders', fontsize=10, fontweight='bold')
-            ax.set_title(f'MC Site: {site}\n(Top 5 as % of {site_total_orders:,} Total Orders)', 
+            ax.set_title(f'MC Site: {site}\n(Jan 1, 2025 - Dec 31, 2025)\n(Top 5 as % of {site_total_orders:,} Total Orders)', 
                         fontsize=11, fontweight='bold', pad=10)
             ax.grid(axis='x', alpha=0.3)
             
@@ -919,7 +927,7 @@ if len(all_cs_sites) > 0:
             ax.set_yticklabels(site_df['Category'], fontsize=8)
             ax.invert_yaxis()
             ax.set_xlabel('% of Total Site Orders', fontsize=9, fontweight='bold')
-            ax.set_title(f'CS Site: {site}\n(Top 5 as % of {site_total_orders:,} Total Orders)', 
+            ax.set_title(f'CS Site: {site}\n(Jan 1, 2025 - Dec 31, 2025)\n(Top 5 as % of {site_total_orders:,} Total Orders)', 
                         fontsize=10, fontweight='bold', pad=10)
             ax.grid(axis='x', alpha=0.3)
             
@@ -980,7 +988,7 @@ if len(all_mc_sites) > 0:
             ax.set_yticklabels(site_df['Category'], fontsize=10)
             ax.invert_yaxis()
             ax.set_xlabel('% of Total Site Orders', fontsize=10, fontweight='bold')
-            ax.set_title(f'MC Site: {site}\n(Top 3 as % of {site_total_orders:,} Total Orders)', 
+            ax.set_title(f'MC Site: {site}\n(Jan 1, 2025 - Dec 31, 2025)\n(Top 3 as % of {site_total_orders:,} Total Orders)', 
                         fontsize=11, fontweight='bold', pad=10)
             ax.grid(axis='x', alpha=0.3)
             
@@ -1041,7 +1049,7 @@ if len(all_cs_sites) > 0:
             ax.set_yticklabels(site_df['Category'], fontsize=9)
             ax.invert_yaxis()
             ax.set_xlabel('% of Total Site Orders', fontsize=9, fontweight='bold')
-            ax.set_title(f'CS Site: {site}\n(Top 3 as % of {site_total_orders:,} Total Orders)', 
+            ax.set_title(f'CS Site: {site}\n(Jan 1, 2025 - Dec 31, 2025)\n(Top 3 as % of {site_total_orders:,} Total Orders)', 
                         fontsize=10, fontweight='bold', pad=10)
             ax.grid(axis='x', alpha=0.3)
             
@@ -1101,8 +1109,9 @@ if len(all_mc_sites) > 0:
             ax.invert_yaxis()
             ax.set_xlabel('Number of Orders', fontsize=10, fontweight='bold')
             site_total_orders = site_counts.get((site, 'EX'), 0)
-            ax.set_title(f'MC Site: {site}\n(Top 5 by Frequency - {site_total_orders:,} Total Orders)', 
-                        fontsize=11, fontweight='bold', pad=10)
+            site_pct = (site_instance_count / site_total_orders * 100) if site_total_orders > 0 else 0
+            ax.set_title(f'MC Site: {site}\n(Jan 1, 2025 - Dec 31, 2025)\nTop 5 by Frequency - n = {site_instance_count:,} ({site_pct:.2f}% of {site_total_orders:,} total orders)', 
+                        fontsize=10, fontweight='bold', pad=10)
             ax.legend(loc='lower right', fontsize=8)
             ax.grid(axis='x', alpha=0.3)
             
@@ -1162,8 +1171,9 @@ if len(all_cs_sites) > 0:
             ax.invert_yaxis()
             ax.set_xlabel('Number of Orders', fontsize=9, fontweight='bold')
             site_total_orders = site_counts.get((site, 'CS'), 0)
-            ax.set_title(f'CS Site: {site}\n(Top 5 by Frequency - {site_total_orders:,} Total Orders)', 
-                        fontsize=10, fontweight='bold', pad=10)
+            site_pct = (site_instance_count / site_total_orders * 100) if site_total_orders > 0 else 0
+            ax.set_title(f'CS Site: {site}\n(Jan 1, 2025 - Dec 31, 2025)\nTop 5 by Frequency - n = {site_instance_count:,} ({site_pct:.2f}% of {site_total_orders:,} total orders)', 
+                        fontsize=9, fontweight='bold', pad=10)
             ax.legend(loc='lower right', fontsize=7)
             ax.grid(axis='x', alpha=0.3)
             

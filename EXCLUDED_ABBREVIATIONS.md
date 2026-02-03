@@ -4,10 +4,10 @@ This document lists unapproved abbreviations from the ISMP Canada "Do Not Use" l
 
 ## Summary
 
-| Abbreviation | Meaning | Reason for Exclusion | False Positive Examples |
-|--------------|---------|---------------------|------------------------|
-| AS | Left Ear (Auris Sinister) | Common English word "as" | "as needed", "as per", "drops as directed" |
-| I | Roman numeral one | Single letter, too common | "I will", "I have", any sentence starting with "I" |
+| Abbreviation | Meaning | Status | Notes |
+|--------------|---------|--------|-------|
+| AS | Left Ear (Auris Sinister) | ✅ INCLUDED (with filtering) | Filters out "as needed" patterns |
+| I | Roman numeral one | ❌ EXCLUDED | Single letter, too common in prose |
 
 ---
 
@@ -17,41 +17,34 @@ This document lists unapproved abbreviations from the ISMP Canada "Do Not Use" l
 
 **ISMP Status:** ❌ Do Not Use  
 **Preferred:** Left ear, auris sinister  
-**Detection Status:** ⚠️ EXCLUDED from automated detection
+**Detection Status:** ✅ INCLUDED (as of 2026-02-02) with filtering
 
 #### Problem
-The abbreviation "AS" (for left ear) is indistinguishable from the extremely common English word "as" (meaning "in the manner of" or "during"). 
+The abbreviation "AS" (for left ear) is indistinguishable from the extremely common English word "as" (meaning "in the manner of" or "during"). The primary false positive is "as needed" in various forms.
 
-#### Pattern Attempts
-We tried multiple pattern refinements:
-1. **Initial:** `%[0-9]AS %` - Matched "10 **as** needed", "5 **as** per protocol"
-2. **Refined:** `%drop% AS %` - Matched "drops **as** needed", "drop **as** per"  
-3. **Final:** `%drop AS %` - Still matched "drops **as** per", "Teardrops **as** ordered"
+#### Solution Implemented (2026-02-02)
+AS detection is now **INCLUDED** with the following approach:
+1. **Pattern:** Requires drop/drops/gtt/gtts context: `%drop AS %`, `%drops AS %`, `%gtt AS %`, `%gtts AS %`
+2. **Filtering:** Excludes all orders containing common "as" phrases (case-insensitive variations):
+   - `%as needed%` (all case variations)
+   - `%as ordered%` (all case variations)
+   - `%as per%` (all case variations)
+   - `%as closest%` (all case variations)
 
-Even with strict context requirements (requiring "drop/drops/gtt/gtts" immediately before AS), we still get massive false positives.
+#### Rationale
+The vast majority of false positives are "as needed" phrases. By filtering these out, we can capture legitimate AS usage while eliminating the most common false positive pattern.
 
-#### False Positive Examples (from real data)
-- "Apply as many **drops as** needed" ✗
-- "Instill 1 drop sublingual Q2H **as** needed" ✗
-- "SUBSTITUTED for travoprost eye **drops as** per policy" ✗
-- "Give with brimonidine **drops as** closest equivalent" ✗
-- "CLOSEST EQUIVALENT TO SYSTANE EYE **DROPS AS** ORDERED" ✗
-- "Tear**drops as** closest formulary equivalent" ✗
+#### False Positive Examples (filtered out)
+- "Apply as many **drops as** needed" ✗ (filtered by "as needed")
+- "Instill 1 drop sublingual Q2H **as** needed" ✗ (filtered by "as needed")
+- "SUBSTITUTED for travoprost eye **drops as** per policy" ✓ (may still be detected - requires monitoring)
+- "Give with brimonidine **drops as** closest equivalent" ✓ (may still be detected - requires monitoring)
 
-#### Impact
-- **Original data (no filter):** 382 instances (100% false positives - all "as needed", "as per", etc.)
-- **After refinement 1:** 167 instances (still mostly false positives)
-- **After refinement 2:** 43 instances (still all false positives based on manual review)
-
-#### Decision
-**EXCLUDE AS from automated detection** and rely on manual review if needed.
-
-#### Legitimate Use (if it exists)
+#### Legitimate Use
 If AS is actually used for left ear, it would appear as:
-- "Instill 1 drop AS" (uppercase, no other words)
-- "Apply gtt AS left ear"
-
-However, we found **zero** legitimate instances in our dataset of 10,000+ orders.
+- "Instill 1 drop AS" ✓ (would be detected)
+- "Apply gtt AS left ear" ✓ (would be detected)
+- "2 drops AS TID" ✓ (would be detected)
 
 ---
 
@@ -133,35 +126,37 @@ SELECT 'PAT', '%mcg MS %',   'MS (Morphine or Magnesium Sulfate)'
 
 ---
 
-## Detection Statistics (2025-01-29 Update)
+## Detection Statistics
 
-| Abbreviation | Instances Detected | Estimated False Positive Rate |
-|--------------|-------------------|------------------------------|
-| < or > | 7,164 | <1% |
-| cc | 1,126 | <1% |
-| @ | 965 | <1% |
-| D/C | 205 | <5% |
-| U | 186 | <1% |
-| x/7 | 122 | <1% |
-| IU | 117 | <1% |
-| OD | 110 | ~5% |
-| MS | 60 → TBD after rerun | <1% (with new filter) |
-| ii (Roman) | 48 | <5% |
-| **AS** | **EXCLUDED** | **~100%** |
-| **I** | **EXCLUDED** | **~99%** |
+| Abbreviation | Instances Detected | Estimated False Positive Rate | Notes |
+|--------------|-------------------|------------------------------|-------|
+| < or > | 7,164 | <1% | 2025 data |
+| cc | 1,126 | <1% | 2025 data |
+| @ | 965 | <1% | 2025 data |
+| D/C | 205 | <5% | 2025 data |
+| U | 186 | <1% | 2025 data |
+| x/7 | 122 | <1% | 2025 data |
+| IU | 117 | <1% | 2025 data |
+| OD | 110 | ~5% | 2025 data |
+| MS | ~60 | <1% | With filtering (2025 data) |
+| ii (Roman) | 48 | <5% | 2025 data |
+| **AS** | **TBD** | **<10% (estimated)** | **ADDED 2026-02-02 with "as needed" filter** |
+| **I** | **EXCLUDED** | **~99%** | Still excluded |
 
 ---
 
 ## Recommendations
 
 ### For AS (Left Ear)
-- **Manual Review:** If concern exists about AS usage, manually search for:
-  - "drop AS"
-  - "drops AS"  
-  - "gtt AS"
-  - "gtts AS"
-- **Education:** Focus education on correct terminology ("left ear") regardless of detection
-- **Alternative Detection:** Consider case-sensitive search for uppercase "AS" only (would reduce but not eliminate false positives)
+- **Monitor Results:** AS detection is now active with "as needed" filtering. Monitor initial results for:
+  - Remaining false positive rate
+  - Detection of legitimate AS usage
+  - Need for additional filtering patterns (e.g., "as per", "as directed")
+- **Education:** Focus education on correct terminology ("left ear") regardless of detection accuracy
+- **Further Refinement:** If false positive rate remains high, consider additional filters:
+  - "as per"
+  - "as directed"
+  - "as ordered"
 
 ### For Roman Numeral I
 - **Manual Review:** Search for specific drug names known to use Roman numerals (e.g., "Coagulation Factor I")
@@ -195,6 +190,10 @@ Consider re-including AS if:
 
 ---
 
-**Document Version:** 1.0  
-**Last Updated:** 2026-01-29  
+**Document Version:** 1.1  
+**Last Updated:** 2026-02-02  
+**Updates:** 
+- Added AS (Left Ear) detection with "as needed" filtering
+- Changed AS status from EXCLUDED to INCLUDED
+
 **Contact:** FHA Medication Safety / Pharmacy

@@ -1,5 +1,5 @@
-DECLARE @StartDate DATE = DATEFROMPARTS(YEAR(GETDATE()) - 1, 1, 1);
-DECLARE @EndDate   DATE = DATEFROMPARTS(YEAR(GETDATE()), 1, 1);
+DECLARE @StartDate DATE = DATEFROMPARTS(2025, 1, 1);
+DECLARE @EndDate   DATE = DATEFROMPARTS(2026, 1, 1);
 
 WITH Forbidden (MatchType, Pattern, Meaning) AS (
 
@@ -55,9 +55,8 @@ WITH Forbidden (MatchType, Pattern, Meaning) AS (
     SELECT 'CHAR', ' EOD ', 'EOD (Every Other Day)' UNION ALL
     SELECT 'CHAR', ' eod ', 'EOD (Every Other Day)' UNION ALL
 
-    -- Ear abbreviations (AD and AU only - AS excluded due to false positives)
-    -- AS generates too many false positives ("as needed", "as per", "drops as", etc.)
-    -- AD and AU don't have this problem since "ad" and "au" are not common English words
+    -- Ear abbreviations
+    -- AD and AU don't have false positive issues since "ad" and "au" are not common English words
     SELECT 'PAT', '%drop AD %',  'AD (Right Ear)' UNION ALL
     SELECT 'PAT', '%drops AD %', 'AD (Right Ear)' UNION ALL
     SELECT 'PAT', '%gtt AD %',   'AD (Right Ear)' UNION ALL
@@ -66,7 +65,11 @@ WITH Forbidden (MatchType, Pattern, Meaning) AS (
     SELECT 'PAT', '%drops AU %', 'AU (Both Ears)' UNION ALL
     SELECT 'PAT', '%gtt AU %',   'AU (Both Ears)' UNION ALL
     SELECT 'PAT', '%gtts AU %',  'AU (Both Ears)' UNION ALL
-    -- NOTE: AS (Left Ear) is EXCLUDED - see EXCLUDED_ABBREVIATIONS.md
+    -- AS (Left Ear) - included with filtering for "as needed" patterns
+    SELECT 'PAT', '%drop AS %',  'AS (Left Ear)' UNION ALL
+    SELECT 'PAT', '%drops AS %', 'AS (Left Ear)' UNION ALL
+    SELECT 'PAT', '%gtt AS %',   'AS (Left Ear)' UNION ALL
+    SELECT 'PAT', '%gtts AS %',  'AS (Left Ear)' UNION ALL
 
     -- Eye abbreviations
     SELECT 'PAT', '%[0-9]OS %',  'OS (Left Eye)' UNION ALL
@@ -92,10 +95,10 @@ WITH Forbidden (MatchType, Pattern, Meaning) AS (
     SELECT 'PAT', '%[^A-Za-z]MgSO4[^A-Za-z]%', 'MgSO4 (Magnesium Sulfate)' UNION ALL
 
     -- Roman numerals (II / III only)
-    SELECT 'PAT', '%[ ]ii[ ][^.]%',  'Roman numeral ii (numeric representation)' UNION ALL
-    SELECT 'PAT', '%[ ]II[ ][^.]%',  'Roman numeral II (numeric representation)' UNION ALL
-    SELECT 'PAT', '%[ ]iii[ ][^.]%', 'Roman numeral iii (numeric representation)' UNION ALL
-    SELECT 'PAT', '%[ ]III[ ][^.]%', 'Roman numeral III (numeric representation)' UNION ALL
+    SELECT 'PAT', '%[ ]ii[ ][^.]%',  'ii (Roman numeral)' UNION ALL
+    SELECT 'PAT', '%[ ]II[ ][^.]%',  'II (Roman numeral)' UNION ALL
+    SELECT 'PAT', '%[ ]iii[ ][^.]%', 'iii (Roman numeral)' UNION ALL
+    SELECT 'PAT', '%[ ]III[ ][^.]%', 'III (Roman numeral)' UNION ALL
 
     -- Dot / tally notation
     SELECT 'CHAR', NCHAR(7786),                              'Ṫ (Numeric tally notation)' UNION ALL
@@ -103,9 +106,15 @@ WITH Forbidden (MatchType, Pattern, Meaning) AS (
     SELECT 'CHAR', NCHAR(7786) + NCHAR(7786) + NCHAR(7786), 'ṪṪṪ (Numeric tally notation)' UNION ALL
     SELECT 'CHAR', NCHAR(7787),                              'ṫ (Numeric tally notation)' UNION ALL
 
-    -- Time notation
-    SELECT 'PAT', '%[0-9]/7%',  'x/7 (Days notation)' UNION ALL
-    SELECT 'PAT', '%[0-9]/52%', 'y/52 (Weeks notation)'
+    -- Time notation (specific ranges: 1-7 for days, 1-52 for weeks)
+    SELECT 'PAT', '%[^0-9][1-7]/7[^0-9]%', 'x/7 (Days notation)' UNION ALL
+    SELECT 'PAT', '%[1-7]/7[^0-9]%',       'x/7 (Days notation)' UNION ALL
+    SELECT 'PAT', '%[^0-9][1-9]/52[^0-9]%',     'y/52 (Weeks notation)' UNION ALL
+    SELECT 'PAT', '%[1-9]/52[^0-9]%',           'y/52 (Weeks notation)' UNION ALL
+    SELECT 'PAT', '%[^0-9][1-4][0-9]/52[^0-9]%','y/52 (Weeks notation)' UNION ALL
+    SELECT 'PAT', '%[1-4][0-9]/52[^0-9]%',      'y/52 (Weeks notation)' UNION ALL
+    SELECT 'PAT', '%[^0-9]5[0-2]/52[^0-9]%',    'y/52 (Weeks notation)' UNION ALL
+    SELECT 'PAT', '%5[0-2]/52[^0-9]%',          'y/52 (Weeks notation)'
 ),
 
 CombinedLabelComments AS (
@@ -239,12 +248,54 @@ WHERE rx.Sig <> '.STK-MED'
   AND rx.EnterDate >= @StartDate
   AND rx.EnterDate <  @EndDate
   AND flags.Flagged IS NOT NULL
+  -- Filter false positives for Roman numerals
   AND ISNULL(dose.FullDoseInstruction, '') NOT LIKE '%Antithrombin III%'
   AND ISNULL(label.FullLabelComment, '')    NOT LIKE '%Antithrombin III%'
   AND ISNULL(dose.FullDoseInstruction, '') NOT LIKE '%Level II%'
   AND ISNULL(label.FullLabelComment, '')    NOT LIKE '%Level II%'
   AND ISNULL(dose.FullDoseInstruction, '') NOT LIKE '%Level III%'
-  AND ISNULL(label.FullLabelComment, '')    NOT LIKE '%Level III%';
+  AND ISNULL(label.FullLabelComment, '')    NOT LIKE '%Level III%'
+  AND ISNULL(dose.FullDoseInstruction, '') NOT LIKE '%phase II%'
+  AND ISNULL(dose.FullDoseInstruction, '') NOT LIKE '%Phase II%'
+  AND ISNULL(dose.FullDoseInstruction, '') NOT LIKE '%PHASE II%'
+  AND ISNULL(label.FullLabelComment, '')    NOT LIKE '%phase II%'
+  AND ISNULL(label.FullLabelComment, '')    NOT LIKE '%Phase II%'
+  AND ISNULL(label.FullLabelComment, '')    NOT LIKE '%PHASE II%'
+  AND ISNULL(dose.FullDoseInstruction, '') NOT LIKE '%NATURALE II%'
+  AND ISNULL(label.FullLabelComment, '')    NOT LIKE '%NATURALE II%'
+  -- Filter false positives for AS (Left Ear) - exclude common "as" phrases
+  AND ISNULL(dose.FullDoseInstruction, '') NOT LIKE '%as needed%'
+  AND ISNULL(dose.FullDoseInstruction, '') NOT LIKE '%AS needed%'
+  AND ISNULL(dose.FullDoseInstruction, '') NOT LIKE '%As needed%'
+  AND ISNULL(dose.FullDoseInstruction, '') NOT LIKE '%as NEEDED%'
+  AND ISNULL(dose.FullDoseInstruction, '') NOT LIKE '%as ordered%'
+  AND ISNULL(dose.FullDoseInstruction, '') NOT LIKE '%AS ordered%'
+  AND ISNULL(dose.FullDoseInstruction, '') NOT LIKE '%As ordered%'
+  AND ISNULL(dose.FullDoseInstruction, '') NOT LIKE '%as ORDERED%'
+  AND ISNULL(dose.FullDoseInstruction, '') NOT LIKE '%as per%'
+  AND ISNULL(dose.FullDoseInstruction, '') NOT LIKE '%AS per%'
+  AND ISNULL(dose.FullDoseInstruction, '') NOT LIKE '%As per%'
+  AND ISNULL(dose.FullDoseInstruction, '') NOT LIKE '%as PER%'
+  AND ISNULL(dose.FullDoseInstruction, '') NOT LIKE '%as closest%'
+  AND ISNULL(dose.FullDoseInstruction, '') NOT LIKE '%AS closest%'
+  AND ISNULL(dose.FullDoseInstruction, '') NOT LIKE '%As closest%'
+  AND ISNULL(dose.FullDoseInstruction, '') NOT LIKE '%as CLOSEST%'
+  AND ISNULL(label.FullLabelComment, '') NOT LIKE '%as needed%'
+  AND ISNULL(label.FullLabelComment, '') NOT LIKE '%AS needed%'
+  AND ISNULL(label.FullLabelComment, '') NOT LIKE '%As needed%'
+  AND ISNULL(label.FullLabelComment, '') NOT LIKE '%as NEEDED%'
+  AND ISNULL(label.FullLabelComment, '') NOT LIKE '%as ordered%'
+  AND ISNULL(label.FullLabelComment, '') NOT LIKE '%AS ordered%'
+  AND ISNULL(label.FullLabelComment, '') NOT LIKE '%As ordered%'
+  AND ISNULL(label.FullLabelComment, '') NOT LIKE '%as ORDERED%'
+  AND ISNULL(label.FullLabelComment, '') NOT LIKE '%as per%'
+  AND ISNULL(label.FullLabelComment, '') NOT LIKE '%AS per%'
+  AND ISNULL(label.FullLabelComment, '') NOT LIKE '%As per%'
+  AND ISNULL(label.FullLabelComment, '') NOT LIKE '%as PER%'
+  AND ISNULL(label.FullLabelComment, '') NOT LIKE '%as closest%'
+  AND ISNULL(label.FullLabelComment, '') NOT LIKE '%AS closest%'
+  AND ISNULL(label.FullLabelComment, '') NOT LIKE '%As closest%'
+  AND ISNULL(label.FullLabelComment, '') NOT LIKE '%as CLOSEST%';
 
 -- =============================================================================
 -- TOTAL ORDER COUNTS (for accurate percentage denominators)
@@ -304,3 +355,21 @@ JOIN FHA_ANALYTICS.FHA.D_MeditechPHASiteDictionary site
 WHERE rx.Sig <> '.STK-MED'
   AND rx.EnterDate >= @StartDate
   AND rx.EnterDate <  @EndDate;
+
+-- All Sites List (including those with zero violations)
+SELECT DISTINCT
+    site.Mnemonic AS Site,
+    CASE WHEN rx.SYSSystemID = 'MC' THEN 'CS' ELSE rx.SYSSystemID END AS [System]
+FROM FHA_ANALYTICS.FHA.F_MeditechPHARxMain rx
+JOIN FHA_ANALYTICS.FHA.F_MeditechADMPatMain pat
+  ON rx.Patient COLLATE DATABASE_DEFAULT = pat.Urn COLLATE DATABASE_DEFAULT
+JOIN FHA_ANALYTICS.FHA.D_MeditechMISLocnMain loc
+  ON loc.Mnemonic COLLATE DATABASE_DEFAULT = pat.Location COLLATE DATABASE_DEFAULT
+JOIN FHA_ANALYTICS.FHA.D_MeditechPHASiteDictionary site
+  ON site.Mnemonic COLLATE DATABASE_DEFAULT = loc.OeSite COLLATE DATABASE_DEFAULT
+WHERE rx.Sig <> '.STK-MED'
+  AND rx.EnterDate >= @StartDate
+  AND rx.EnterDate <  @EndDate
+ORDER BY 
+    CASE WHEN rx.SYSSystemID = 'MC' THEN 'CS' ELSE rx.SYSSystemID END,
+    site.Mnemonic;
