@@ -584,6 +584,68 @@ if len(df_mc_pct) > 0:
     plt.close()
 
 # ============================================================================
+# FIGURE 2B_NO_LABELS: MC (EX) System Analysis - PERCENTAGE (No Labels)
+# ============================================================================
+if len(df_mc_pct) > 0:
+    fig2b_nolabel = plt.figure(figsize=(14, 8))
+    ax1 = plt.subplot(1, 1, 1)
+    x_pos = range(len(df_mc_pct))
+    width = 0.6
+    
+    # Define colors for each site
+    site_colors = {'RCH': '#e74c3c', 'ERH': '#3498db', 'MMH': '#2ecc71', 'FCH': '#f39c12',
+                   'BH': '#9b59b6', 'SMH': '#1abc9c', 'RMH': '#e67e22', 'ARH': '#95a5a6',
+                   'LMH': '#34495e', 'PAH': '#16a085', 'CGH': '#d35400', 'DH': '#c0392b',
+                   'CHE': '#8e44ad', 'FLW': '#27ae60', 'CAC': '#f1c40f', 'MSA': '#e84393',
+                   'QPH': '#00b894', 'HV': '#0984e3'}
+    
+    # Calculate site contributions as percentages
+    for i, (idx, row) in enumerate(df_mc_pct.iterrows()):
+        abbrev = row['Category']
+        left = 0
+        
+        # Stack bars by site (using percentages)
+        for site, _ in all_mc_sites:
+            site_dose = mc_sites[site]['dose'].get(abbrev, 0)
+            site_label = mc_sites[site]['label'].get(abbrev, 0)
+            site_total = site_dose + site_label
+            # Use ACCURATE site order count from database
+            site_order_count = site_counts.get((site, 'EX'), len(mc_sites[site]['orders']))
+            
+            # Calculate percentage of site's orders
+            site_pct = (site_total / site_order_count * 100) if site_order_count > 0 else 0
+            
+            if site_pct > 0:
+                ax1.barh(i, site_pct, width, left=left, 
+                        color=site_colors.get(site, '#95a5a6'), 
+                        label=site if i == 0 else '')
+                left += site_pct
+    
+    ax1.set_yticks(x_pos)
+    ax1.set_yticklabels(df_mc_pct['Category'], fontsize=10)
+    ax1.invert_yaxis()
+    ax1.set_xlabel('% of Orders', fontsize=12, fontweight='bold')
+    ax1.set_title(f'Top 5 Unapproved Abbreviations - MC System (EX)\n(Jan 1, 2025 - Dec 31, 2025)\n(% of {mc_orders:,} Orders - Stacked by Site)', 
+                  fontsize=13, fontweight='bold', pad=15)
+    
+    # Create legend with unique site labels only
+    handles, labels = ax1.get_legend_handles_labels()
+    by_label = dict(zip(labels, handles))
+    ax1.legend(by_label.values(), by_label.keys(), loc='lower right', fontsize=9)
+    ax1.grid(axis='x', alpha=0.3)
+    
+    # NO percentage labels at the end
+    
+    # Set reasonable x-axis limits based on data
+    max_pct = df_mc_pct['Pct_of_Orders'].max()
+    ax1.set_xlim(0, max_pct * 1.05)  # 5% padding only
+    
+    plt.tight_layout()
+    plt.savefig('Test Results/sys_sum_ua_figs/unapproved_abbreviations_mc_system_pct_no_labels.png', dpi=300, bbox_inches='tight')
+    print("Figure 2B (no labels) saved: Test Results/sys_sum_ua_figs/unapproved_abbreviations_mc_system_pct_no_labels.png")
+    plt.close()
+
+# ============================================================================
 # FIGURE 3: CS System Analysis
 # ============================================================================
 if len(df_cs) > 0:
@@ -823,6 +885,74 @@ if len(df_cs_pct) > 0:
     plt.tight_layout()
     plt.savefig('Test Results/sys_sum_ua_figs/unapproved_abbreviations_cs_system_pct.png', dpi=300, bbox_inches='tight')
     print("Figure 3B saved: Test Results/sys_sum_ua_figs/unapproved_abbreviations_cs_system_pct.png")
+    plt.close()
+
+# ============================================================================
+# FIGURE 3B_NO_LABELS: CS System Analysis - PERCENTAGE (No Labels)
+# ============================================================================
+if len(df_cs_pct) > 0:
+    fig3b_nolabel = plt.figure(figsize=(14, 8))
+    ax1 = plt.subplot(1, 1, 1)
+    x_pos = range(len(df_cs_pct))
+    width = 0.6
+    
+    # Use same color palette for sites
+    site_colors = {'RCH': '#e74c3c', 'ERH': '#3498db', 'MMH': '#2ecc71', 'FCH': '#f39c12',
+                   'BH': '#9b59b6', 'SMH': '#1abc9c', 'RMH': '#e67e22', 'ARH': '#95a5a6',
+                   'LMH': '#34495e', 'PAH': '#16a085', 'CGH': '#d35400', 'DH': '#c0392b',
+                   'CHE': '#8e44ad', 'FLW': '#27ae60', 'CAC': '#f1c40f', 'MSA': '#e84393',
+                   'QPH': '#00b894', 'HV': '#0984e3'}
+    
+    # Track cumulative totals for positioning
+    bar_totals = []
+    
+    # Calculate site contributions as percentages
+    for i, (idx, row) in enumerate(df_cs_pct.iterrows()):
+        abbrev = row['Category']
+        left = 0
+        
+        # Stack bars by site (using percentages)
+        for site, _ in all_cs_sites:
+            site_dose = cs_sites[site]['dose'].get(abbrev, 0)
+            site_label = cs_sites[site]['label'].get(abbrev, 0)
+            site_total = site_dose + site_label
+            # Use ACCURATE site order count from database
+            site_order_count = site_counts.get((site, 'CS'), len(cs_sites[site]['orders']))
+            
+            # Calculate percentage of site's orders
+            site_pct = (site_total / site_order_count * 100) if site_order_count > 0 else 0
+            
+            if site_pct > 0:
+                ax1.barh(i, site_pct, width, left=left, 
+                        color=site_colors.get(site, '#95a5a6'), 
+                        label=site if i == 0 else '')
+                left += site_pct
+        
+        # Store the total stacked width for this row
+        bar_totals.append(left)
+    
+    ax1.set_yticks(x_pos)
+    ax1.set_yticklabels(df_cs_pct['Category'], fontsize=10)
+    ax1.invert_yaxis()
+    ax1.set_xlabel('% of Orders', fontsize=12, fontweight='bold')
+    ax1.set_title(f'Top 5 Unapproved Abbreviations - CS System\n(Jan 1, 2025 - Dec 31, 2025)\n(% of {cs_orders:,} Orders - Stacked by Site)', 
+                  fontsize=13, fontweight='bold', pad=15)
+    
+    # Create legend with unique site labels only
+    handles, labels = ax1.get_legend_handles_labels()
+    by_label = dict(zip(labels, handles))
+    ax1.legend(by_label.values(), by_label.keys(), loc='lower right', fontsize=9)
+    ax1.grid(axis='x', alpha=0.3)
+    
+    # NO percentage labels at the end
+    
+    # Set reasonable x-axis limits based on data
+    max_bar_total = max(bar_totals)
+    ax1.set_xlim(0, max_bar_total * 1.05)  # 5% padding only
+    
+    plt.tight_layout()
+    plt.savefig('Test Results/sys_sum_ua_figs/unapproved_abbreviations_cs_system_pct_no_labels.png', dpi=300, bbox_inches='tight')
+    print("Figure 3B (no labels) saved: Test Results/sys_sum_ua_figs/unapproved_abbreviations_cs_system_pct_no_labels.png")
     plt.close()
 
 # ============================================================================
