@@ -29,10 +29,10 @@ with open(input_file, 'r', encoding='utf-8-sig') as f:
 print(f"\nFound {len(site_data)} sites")
 print(f"Total rows: {sum(len(rows) for rows in site_data.values())}")
 
-# Write separate CSV for each site
+# Write separate CSV file for each site
 print("\nCreating site-specific CSV files...")
 for site, rows in sorted(site_data.items()):
-    output_file = os.path.join(output_dir, f'{site}_violations.csv')
+    output_file = os.path.join(output_dir, f'{site}_Abbreviation_Usage_Review_2025-02-02.csv')
     
     with open(output_file, 'w', newline='', encoding='utf-8') as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
